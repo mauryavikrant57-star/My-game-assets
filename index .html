@@ -1,0 +1,2573 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Aero Dash - Pro Edition</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-tap-highlight-color: transparent; }
+        body, html { width: 100%; height: 100%; overflow: hidden; background: #000; font-family: Arial, sans-serif; }
+        
+        #game-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            max-width: 480px;
+            margin: 0 auto;
+            background: url('https://raw.githubusercontent.com/mauryavikrant57-star/My-game-assets/refs/heads/main/1783854852475.png') no-repeat center center;
+            background-size: cover;
+            overflow: hidden;
+            transition: filter 0.8s ease, background 1s ease;
+        }
+
+        /* Glassmorphism Loader Screen with frosted blur, crystal ring, and thick breaking shooting stars */
+        #loader-screen {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background:
+                radial-gradient(circle at 50% 34%, rgba(56, 189, 248, 0.28) 0%, rgba(16, 29, 76, 0.78) 48%, rgba(4, 6, 22, 0.94) 100%),
+                radial-gradient(circle at 78% 86%, rgba(129, 140, 248, 0.24) 0%, transparent 62%),
+                linear-gradient(155deg, rgba(14, 24, 58, 0.72) 0%, rgba(6, 11, 28, 0.86) 100%);
+            backdrop-filter: blur(18px) saturate(155%);
+            -webkit-backdrop-filter: blur(18px) saturate(155%);
+            z-index: 99999;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: center;
+            color: #fff;
+            text-align: center;
+            padding-top: 152px;
+            overflow: hidden;
+        }
+
+        /* Soft refractive glass light rays behind title & crystal */
+        .loader-rays {
+            position: absolute;
+            top: 12%;
+            left: 50%;
+            width: 145%;
+            height: 70%;
+            transform: translateX(-50%);
+            background:
+                conic-gradient(
+                    from 165deg at 50% 42%,
+                    transparent 0deg,
+                    rgba(125, 211, 252, 0.14) 18deg,
+                    transparent 36deg,
+                    rgba(254, 240, 138, 0.12) 58deg,
+                    transparent 82deg,
+                    rgba(34, 211, 238, 0.16) 115deg,
+                    transparent 148deg,
+                    rgba(255, 255, 255, 0.1) 185deg,
+                    transparent 360deg
+                );
+            filter: blur(14px);
+            animation: causticRayDrift 12s ease-in-out infinite alternate;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        @keyframes causticRayDrift {
+            0% { transform: translateX(-50%) rotate(-2deg) scale(0.99); opacity: 0.75; }
+            50% { transform: translateX(-50%) rotate(2deg) scale(1.03); opacity: 0.98; }
+            100% { transform: translateX(-50%) rotate(-1.5deg) scale(1); opacity: 0.82; }
+        }
+
+        /* Clean Sparkling Stars */
+        .loader-star {
+            position: absolute;
+            background: radial-gradient(circle, rgba(255,255,255,1) 0%, rgba(125,211,252,0.75) 48%, rgba(254,240,138,0.35) 72%, transparent 100%);
+            clip-path: polygon(50% 0%, 63% 37%, 100% 50%, 63% 63%, 50% 100%, 37% 63%, 0% 50%, 37% 37%);
+            animation: twinkleStar 2.1s infinite ease-in-out;
+            pointer-events: none;
+            z-index: 2;
+        }
+        @keyframes twinkleStar {
+            0%, 100% { opacity: 0.35; transform: scale(0.75) rotate(0deg); }
+            50% { opacity: 1; transform: scale(1.45) rotate(22deg); filter: drop-shadow(0 0 10px #7dd3fc) drop-shadow(0 0 18px #ffffff); }
+        }
+
+        /* Bottom-Right Four-Point Star Sparkle */
+        .bottom-right-sparkle {
+            position: absolute;
+            bottom: 66px;
+            right: 46px;
+            width: 38px;
+            height: 38px;
+            background: radial-gradient(circle, rgba(255,255,255,0.98) 0%, rgba(125,211,252,0.65) 45%, transparent 82%);
+            clip-path: polygon(50% 0%, 63% 37%, 100% 50%, 63% 63%, 50% 100%, 37% 63%, 0% 50%, 37% 37%);
+            filter: drop-shadow(0 0 10px rgba(125, 211, 252, 0.8));
+            animation: sparklePulse 2.4s infinite ease-in-out;
+            pointer-events: none;
+            z-index: 3;
+        }
+        @keyframes sparklePulse {
+            0%, 100% { transform: scale(0.92); opacity: 0.65; }
+            50% { transform: scale(1.22); opacity: 1; }
+        }
+
+        /* Thick, Prominent Breaking Shooting Stars Styled After the Bottom Hero Meteor */
+        .thick-shooting-star {
+            position: absolute;
+            width: 170px;
+            height: 72px;
+            pointer-events: none;
+            z-index: 2;
+            overflow: visible;
+            opacity: 0;
+            will-change: transform, opacity;
+        }
+        .thick-shooting-star .meteor-core-streak {
+            position: absolute;
+            top: 32px;
+            left: 16px;
+            width: 128px;
+            height: 8.5px;
+            border-radius: 999px;
+            background: linear-gradient(
+                90deg,
+                rgba(255, 230, 153, 0) 0%,
+                rgba(0, 210, 255, 0.5) 36%,
+                rgba(103, 245, 255, 0.92) 74%,
+                rgba(255, 255, 255, 1) 100%
+            );
+            box-shadow:
+                0 0 14px rgba(103, 245, 255, 0.85),
+                0 0 26px rgba(255, 255, 255, 0.72);
+        }
+        .thick-shooting-star .meteor-head-flare {
+            position: absolute;
+            top: 25px;
+            right: 14px;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background: radial-gradient(circle, #ffffff 0%, #9ff8ff 48%, rgba(0, 210, 255, 0.62) 75%, transparent 100%);
+            box-shadow:
+                0 0 16px #ffffff,
+                0 0 28px rgba(103, 245, 255, 0.9);
+        }
+        .thick-shooting-star .meteor-shard {
+            position: absolute;
+            border-radius: 999px;
+            background: linear-gradient(90deg, rgba(255, 230, 153, 0), #9ff8ff, #ffffff);
+            box-shadow: 0 0 10px rgba(103, 245, 255, 0.85);
+        }
+        .thick-shooting-star .shard-1 {
+            top: 15px;
+            left: 62px;
+            width: 28px;
+            height: 4px;
+            transform: rotate(-17deg);
+        }
+        .thick-shooting-star .shard-2 {
+            top: 49px;
+            left: 48px;
+            width: 34px;
+            height: 4.5px;
+            transform: rotate(16deg);
+        }
+        .thick-shooting-star .shard-3 {
+            top: 21px;
+            left: 98px;
+            width: 22px;
+            height: 3.5px;
+            transform: rotate(-25deg);
+        }
+        .thick-shooting-star .shard-4 {
+            top: 45px;
+            left: 88px;
+            width: 24px;
+            height: 3.5px;
+            transform: rotate(23deg);
+        }
+
+        /* Diagonal trajectory 1: upper-left toward lower-right */
+        .meteor-path-diag-down-right {
+            animation: meteorDiagDownRight 3.2s infinite ease-out;
+        }
+        @keyframes meteorDiagDownRight {
+            0% {
+                transform: translate(-24px, -22px) rotate(36deg) scale(0.84);
+                opacity: 0;
+            }
+            16% {
+                opacity: 0.98;
+            }
+            76% {
+                opacity: 0.9;
+            }
+            100% {
+                transform: translate(135px, 128px) rotate(36deg) scale(1.14);
+                opacity: 0;
+            }
+        }
+
+        /* Diagonal trajectory 2: upper-right toward lower-left */
+        .meteor-path-diag-down-left {
+            animation: meteorDiagDownLeft 3.3s infinite ease-out;
+        }
+        @keyframes meteorDiagDownLeft {
+            0% {
+                transform: translate(34px, -28px) rotate(144deg) scale(0.84);
+                opacity: 0;
+            }
+            16% {
+                opacity: 0.98;
+            }
+            76% {
+                opacity: 0.9;
+            }
+            100% {
+                transform: translate(-145px, 132px) rotate(144deg) scale(1.14);
+                opacity: 0;
+            }
+        }
+
+        /* Lateral / sweeping trajectory across the mid-lower sky */
+        .meteor-path-sweep-across {
+            animation: meteorSweepAcross 3.4s infinite ease-out;
+        }
+        @keyframes meteorSweepAcross {
+            0% {
+                transform: translate(-36px, 18px) rotate(16deg) scale(0.85);
+                opacity: 0;
+            }
+            16% {
+                opacity: 0.98;
+            }
+            76% {
+                opacity: 0.9;
+            }
+            100% {
+                transform: translate(152px, -38px) rotate(16deg) scale(1.15);
+                opacity: 0;
+            }
+        }
+
+        .crystal-ring-box {
+            position: relative;
+            width: 176px;
+            height: 176px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 16px;
+            z-index: 3;
+            perspective: 720px;
+        }
+
+        /* Clean icy-cyan & soft-gold halo matching the reference crystal image */
+        .crystal-ring-box::before {
+            content: '';
+            position: absolute;
+            width: 154px;
+            height: 154px;
+            border-radius: 50%;
+            background:
+                radial-gradient(
+                    circle,
+                    rgba(0, 242, 254, 0.3) 28%,
+                    rgba(255, 214, 102, 0.18) 54%,
+                    rgba(56, 189, 248, 0.15) 75%,
+                    transparent 94%
+                );
+            filter: blur(12px);
+            animation: crystalAuraPulse 3s ease-in-out infinite;
+            pointer-events: none;
+        }
+
+        @keyframes crystalAuraPulse {
+            0%, 100% { transform: scale(0.96); opacity: 0.78; }
+            50% { transform: scale(1.06); opacity: 1; }
+        }
+
+        .crystal-svg-ring {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            transform-style: preserve-3d;
+            animation: spinCrystal3D 8.5s linear infinite;
+            filter:
+                drop-shadow(0 0 15px rgba(56, 189, 248, 0.92))
+                drop-shadow(0 0 26px rgba(0, 210, 255, 0.56))
+                drop-shadow(0 10px 20px rgba(3, 8, 28, 0.94));
+        }
+
+        .crystal-outer-layer {
+            transform-origin: 70px 70px;
+            animation: outerFacetRotate 9s linear infinite;
+        }
+
+        .crystal-inner-layer {
+            transform-origin: 70px 70px;
+            animation: innerFacetCounterRotate 6.5s linear infinite;
+        }
+
+        .crystal-house-core {
+            transform-origin: 70px 70px;
+            animation: crystalHouseFloat 3.8s ease-in-out infinite;
+        }
+
+        .crystal-electric-threads {
+            animation: electricFilamentPulse 2.1s ease-in-out infinite;
+        }
+
+        .crystal-specular-glint {
+            transform-origin: 70px 70px;
+            animation: specularGlintSweep 3.4s ease-in-out infinite;
+        }
+
+        @keyframes electricFilamentPulse {
+            0%, 100% { opacity: 0.62; filter: drop-shadow(0 0 3px rgba(103, 245, 255, 0.65)); }
+            50% { opacity: 1; filter: drop-shadow(0 0 7px rgba(125, 211, 252, 0.95)); }
+        }
+
+        @keyframes crystalHouseFloat {
+            0%, 100% { transform: translateY(1.5px) scale(0.985); }
+            50% { transform: translateY(-2px) scale(1.02); }
+        }
+
+        @keyframes spinCrystal3D {
+            0% { transform: rotateX(14deg) rotateY(-12deg) rotateZ(0deg); }
+            50% { transform: rotateX(-12deg) rotateY(14deg) rotateZ(180deg); }
+            100% { transform: rotateX(14deg) rotateY(-12deg) rotateZ(360deg); }
+        }
+
+        @keyframes outerFacetRotate {
+            0% { transform: rotate(0deg) scale(1); }
+            50% { transform: rotate(180deg) scale(1.02); }
+            100% { transform: rotate(360deg) scale(1); }
+        }
+
+        @keyframes innerFacetCounterRotate {
+            0% { transform: rotate(360deg) scale(0.99); }
+            50% { transform: rotate(180deg) scale(1.015); }
+            100% { transform: rotate(0deg) scale(0.99); }
+        }
+
+        @keyframes specularGlintSweep {
+            0%, 100% { opacity: 0.55; transform: rotate(0deg) scale(0.94); }
+            50% { opacity: 1; transform: rotate(45deg) scale(1.08); }
+        }
+
+        .loader-text-box {
+            font-family: Arial, sans-serif;
+            font-size: 18px;
+            font-weight: 700;
+            color: #f0f9ff;
+            letter-spacing: 0.8px;
+            margin-bottom: 18px;
+            text-shadow: 0 0 12px rgba(103, 245, 255, 0.65), 0 2px 6px rgba(0, 0, 0, 0.9);
+            z-index: 3;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .dots {
+            display: inline-block;
+            width: 24px;
+            text-align: left;
+        }
+
+        .dots span {
+            opacity: 0;
+            animation: blinkDots 1.4s infinite;
+        }
+
+        .dots span:nth-child(1) { animation-delay: 0.2s; }
+        .dots span:nth-child(2) { animation-delay: 0.4s; }
+        .dots span:nth-child(3) { animation-delay: 0.6s; }
+
+        @keyframes blinkDots {
+            0%, 100% { opacity: 0; }
+            50% { opacity: 1; }
+        }
+
+        .game-title-svg {
+            width: 96%;
+            max-width: 450px;
+            height: auto;
+            filter:
+                drop-shadow(0 0 13px rgba(56, 189, 248, 0.88))
+                drop-shadow(0 0 22px rgba(0, 210, 255, 0.52))
+                drop-shadow(0 6px 12px rgba(0, 0, 0, 0.92));
+            z-index: 3;
+        }
+
+        .screen {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 10;
+        }
+
+        .hidden { display: none !important; }
+
+        #main-menu { background: rgba(0, 0, 0, 0.2); }
+        .btn-play {
+            background: url('https://raw.githubusercontent.com/mauryavikrant57-star/My-game-assets/refs/heads/main/1000036601-removebg-preview.png') no-repeat center;
+            background-size: contain;
+            width: 300px; height: 105px;
+            border: none; cursor: pointer; margin: 12px 0;
+            filter: drop-shadow(0px 8px 16px rgba(0,0,0,0.7));
+            transition: transform 0.1s ease;
+        }
+        .btn-play:active { transform: scale(0.95); }
+
+        .btn-privacy-policy {
+            background: url('https://raw.githubusercontent.com/mauryavikrant57-star/My-game-assets/refs/heads/main/1000037782-removebg-preview.png') no-repeat center;
+            background-size: contain;
+            width: 280px; height: 95px;
+            border: none; cursor: pointer; margin-top: 2px; margin-bottom: 6px;
+            filter: drop-shadow(0px 8px 16px rgba(0,0,0,0.7));
+            transition: transform 0.1s ease;
+        }
+        .btn-privacy-policy:active { transform: scale(0.95); }
+
+        .btn-shop-menu {
+            background: url('https://raw.githubusercontent.com/mauryavikrant57-star/My-game-assets/refs/heads/main/1000044863-removebg-preview.png') no-repeat center;
+            background-size: contain;
+            width: 240px; height: 84px;
+            border: none; cursor: pointer; margin-top: 4px;
+            filter: drop-shadow(0px 8px 16px rgba(0,0,0,0.75));
+            transition: transform 0.1s ease;
+        }
+        .btn-shop-menu:active { transform: scale(0.95); }
+
+        .free-spin-icon {
+            position: absolute; top: 25px; left: 20px;
+            width: 95px; height: 95px;
+            background: url('https://raw.githubusercontent.com/mauryavikrant57-star/My-game-assets/refs/heads/main/1000037773-removebg-preview.png') no-repeat center;
+            background-size: contain; cursor: pointer;
+            filter: drop-shadow(0px 6px 12px rgba(0,0,0,0.6));
+            animation: bounceSpin 2s infinite ease-in-out;
+        }
+        @keyframes bounceSpin {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-6px); }
+        }
+
+        /* Shop Screen Styles */
+        #shop-screen {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(8, 12, 24, 0.92);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            z-index: 1600;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 16px 14px 28px 14px;
+            overflow-y: auto;
+        }
+        .shop-header-bar {
+            width: 100%;
+            max-width: 440px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 14px;
+            flex-shrink: 0;
+        }
+        .shop-back-btn {
+            background: linear-gradient(180deg, #4fc3f7 0%, #0288d1 48%, #01579b 100%);
+            border: 2px solid #b3e5fc;
+            color: #ffffff;
+            font-size: 16px;
+            font-weight: 900;
+            padding: 9px 18px;
+            border-radius: 14px;
+            cursor: pointer;
+            text-shadow: 0 2px 3px rgba(0, 20, 50, 0.9);
+            box-shadow:
+                0 5px 0 #003c71,
+                0 8px 16px rgba(0, 176, 255, 0.55),
+                inset 0 2px 3px rgba(255, 255, 255, 0.65);
+            transition: transform 0.08s ease, box-shadow 0.08s ease;
+        }
+        .shop-back-btn:active {
+            transform: translateY(4px) scale(0.96);
+            box-shadow:
+                0 1px 0 #003c71,
+                0 3px 8px rgba(0, 176, 255, 0.4),
+                inset 0 2px 4px rgba(0, 0, 0, 0.35);
+        }
+
+        .shop-3d-heading {
+            font-family: 'Arial Black', Impact, Arial, sans-serif;
+            font-size: 26px;
+            font-weight: 900;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin: 12px 0 12px 0;
+            text-align: center;
+            width: 100%;
+            flex-shrink: 0;
+        }
+        .shop-3d-character {
+            color: #ffeb3b;
+            text-shadow:
+                0 1px 0 #d48806,
+                0 2px 0 #b87100,
+                0 3px 0 #995c00,
+                0 4px 0 #734300,
+                0 6px 12px rgba(0, 0, 0, 0.9),
+                0 0 18px rgba(255, 235, 59, 0.55);
+        }
+        .shop-3d-background {
+            color: #00e5ff;
+            text-shadow:
+                0 1px 0 #0097a7,
+                0 2px 0 #00796b,
+                0 3px 0 #005b52,
+                0 4px 0 #003d37,
+                0 6px 12px rgba(0, 0, 0, 0.9),
+                0 0 18px rgba(0, 229, 255, 0.55);
+        }
+
+        .shop-row {
+            width: 100%;
+            max-width: 440px;
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 12px;
+            margin-bottom: 14px;
+            flex-shrink: 0;
+        }
+        .shop-card {
+            background: linear-gradient(145deg, rgba(30, 36, 56, 0.95), rgba(14, 18, 30, 0.98));
+            border: 2px solid rgba(255, 255, 255, 0.22);
+            border-radius: 18px;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+            min-width: 0;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.65);
+            transition: transform 0.12s ease, border-color 0.2s ease;
+        }
+        .shop-card:active { transform: scale(0.97); }
+        .shop-card.active-item {
+            border-color: #00e676;
+            box-shadow: 0 0 18px rgba(0, 230, 118, 0.45);
+        }
+        .shop-card.locked-item {
+            border-color: rgba(255, 193, 7, 0.35);
+        }
+        .shop-preview-box {
+            width: 100%;
+            height: 78px;
+            border-radius: 12px;
+            background: rgba(0, 0, 0, 0.45);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            margin-bottom: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .shop-preview-bird {
+            width: 58px;
+            height: 58px;
+            object-fit: contain;
+            filter: drop-shadow(0 3px 6px rgba(0,0,0,0.8));
+        }
+        .shop-preview-bg {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .shop-item-title {
+            color: #ffffff;
+            font-size: 13px;
+            font-weight: bold;
+            margin-bottom: 7px;
+            text-align: center;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 100%;
+        }
+        .shop-action-badge {
+            width: 100%;
+            padding: 6px 8px;
+            border-radius: 10px;
+            font-size: 12px;
+            font-weight: bold;
+            text-align: center;
+            border: none;
+            cursor: pointer;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .badge-free {
+            background: linear-gradient(135deg, #00acc1, #007c91);
+            color: #ffffff;
+        }
+        .badge-locked {
+            background: linear-gradient(135deg, #ff9800, #e65100);
+            color: #ffffff;
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.35);
+        }
+        .badge-active {
+            background: linear-gradient(135deg, #00c853, #007e33);
+            color: #ffffff;
+        }
+
+        #shop-success-toast {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(10, 16, 28, 0.96);
+            border: 3px solid #00e676;
+            border-radius: 20px;
+            padding: 18px 26px;
+            z-index: 3000;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            max-width: 88vw;
+            box-shadow: 0 0 30px rgba(0, 230, 118, 0.65);
+            animation: popIn 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .success-white-text {
+            color: #ffffff;
+            font-size: 22px;
+            font-weight: 900;
+            letter-spacing: 0.6px;
+            text-shadow: 0 2px 6px rgba(0, 0, 0, 0.9);
+        }
+        .success-bold-green-tick {
+            color: #00ff66;
+            font-size: 28px;
+            font-weight: 900;
+            line-height: 1;
+            text-shadow: 0 0 12px rgba(0, 255, 102, 0.85);
+        }
+
+        #tap-to-start-screen {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.03); z-index: 25;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            pointer-events: none;
+        }
+        #tap-to-start-screen > * { pointer-events: auto; }
+        .btn-tap-to-start {
+            background: url('https://raw.githubusercontent.com/mauryavikrant57-star/My-game-assets/refs/heads/main/1000036598-removebg-preview.png') no-repeat center;
+            background-size: contain; width: 300px; height: 110px; border: none; cursor: pointer;
+            filter: drop-shadow(0px 10px 20px rgba(0,0,0,0.9));
+            animation: pulseTap 1.2s infinite ease-in-out;
+        }
+        @keyframes pulseTap {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.06); }
+        }
+
+        #spin-modal {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.88); z-index: 100;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            padding: 10px;
+        }
+        .wheel-box { position: relative; width: 280px; height: 280px; margin-bottom: 15px; }
+        #wheel {
+            width: 100%; height: 100%;
+            background: url('https://raw.githubusercontent.com/mauryavikrant57-star/My-game-assets/refs/heads/main/1000037773-removebg-preview.png') no-repeat center;
+            background-size: contain;
+            transition: transform 5s cubic-bezier(0.1, 0.9, 0.1, 1);
+        }
+        #pointer {
+            position: absolute; top: -12px; left: calc(50% - 20px); width: 40px; height: 40px;
+            background: url('https://raw.githubusercontent.com/mauryavikrant57-star/My-game-assets/refs/heads/main/IMG_20260803_111251.png') no-repeat center;
+            background-size: contain; z-index: 101;
+            filter: drop-shadow(0px 4px 6px rgba(0,0,0,0.8));
+        }
+        .btn-spin-action-large {
+            background: url('https://raw.githubusercontent.com/mauryavikrant57-star/My-game-assets/refs/heads/main/1000036597-removebg-preview.png') no-repeat center;
+            background-size: contain; width: 300px; height: 100px; border: none; cursor: pointer; margin-bottom: 12px;
+            filter: drop-shadow(0px 8px 16px rgba(0,0,0,0.8));
+        }
+        .btn-spin-close {
+            background: url('https://raw.githubusercontent.com/mauryavikrant57-star/My-game-assets/refs/heads/main/1000036216-removebg-preview.png') no-repeat center;
+            background-size: contain; width: 260px; height: 85px; border: none; cursor: pointer;
+            filter: drop-shadow(0px 6px 12px rgba(0,0,0,0.8));
+        }
+
+        #alert-popup-modal {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.75); z-index: 90;
+            display: flex; justify-content: center; align-items: center;
+        }
+        .popup-box {
+            background: linear-gradient(145deg, #1e2332, #0d111a);
+            border: 4px solid #ffeb3b;
+            padding: 24px 30px; border-radius: 24px; text-align: center; color: white; width: 310px;
+            box-shadow: 0 0 30px rgba(255, 235, 59, 0.7), inset 0 0 20px rgba(255,255,255,0.15);
+            animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        @keyframes popIn {
+            0% { transform: scale(0.7); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        .popup-box h3 { font-size: 26px; margin-bottom: 12px; color: #ffeb3b; text-shadow: 2px 2px 6px rgba(0,0,0,0.9); }
+        .popup-box p { font-size: 16px; margin-bottom: 22px; color: #ffffff; line-height: 1.5; text-shadow: 1px 1px 4px rgba(0,0,0,0.9); }
+        .popup-btn { padding: 10px 24px; font-size: 16px; font-weight: bold; border-radius: 14px; border: 2px solid #fff; cursor: pointer; box-shadow: 0 5px 15px rgba(0,0,0,0.6); transition: transform 0.1s; }
+        .popup-btn:active { transform: scale(0.92); }
+        .btn-ok { background: linear-gradient(135deg, #ff9800, #ef6c00); color: white; width: 100%; }
+
+        #top-bar {
+            position: absolute; top: 8px; left: 0; width: 100%;
+            display: flex; justify-content: space-around; align-items: center; padding: 0 10px; z-index: 999 !important;
+            pointer-events: auto !important;
+        }
+        .top-btn {
+            background-size: contain; background-repeat: no-repeat; border: none; background-color: transparent; cursor: pointer;
+            filter: drop-shadow(0px 4px 8px rgba(0,0,0,0.8));
+            transition: transform 0.1s;
+            pointer-events: auto !important;
+            z-index: 1000 !important;
+        }
+        .top-btn:active { transform: scale(0.9); }
+        
+        #btn-home { width: 85px; height: 85px; background-image: url('https://raw.githubusercontent.com/mauryavikrant57-star/My-game-assets/refs/heads/main/1000036600-removebg-preview.png'); z-index: 1000 !important; }
+        #btn-sound { width: 50px; height: 50px; background-image: url('https://raw.githubusercontent.com/mauryavikrant57-star/My-game-assets/refs/heads/main/1000036583-removebg-preview.png'); }
+        
+        .coin-display {
+            color: #fff; font-size: 13px; font-weight: bold; background: rgba(0,0,0,0.75);
+            padding: 4px 8px; border-radius: 14px; display: flex; align-items: center; gap: 4px;
+            border: 2px solid rgba(255,255,255,0.4); box-shadow: 0 4px 10px rgba(0,0,0,0.6);
+            pointer-events: auto !important;
+            z-index: 1000 !important;
+        }
+        .coin-display::before {
+            content: ''; display: inline-block; width: 15px; height: 15px;
+            background: url('https://raw.githubusercontent.com/mauryavikrant57-star/My-game-assets/refs/heads/main/1000036484-removebg-preview.png') no-repeat center; background-size: contain;
+        }
+
+        #game-score-board {
+            position: absolute; top: 110px; width: 100%; text-align: center;
+            color: #ffffff; font-size: 24px; font-weight: bold; text-shadow: 2px 2px 6px rgba(0,0,0,0.9);
+            z-index: 15; pointer-events: none;
+        }
+
+        #gameCanvas { display: block; width: 100%; height: 100%; cursor: pointer; }
+
+        #game-over { background: rgba(0,0,0,0.8); color: white; text-align: center; }
+        .game-over-box {
+            background: linear-gradient(145deg, #1e2332, #0d111a);
+            border: 4px solid #ffeb3b;
+            border-radius: 24px; padding: 24px 30px; box-shadow: 0 0 35px rgba(255, 235, 59, 0.6);
+            display: flex; flex-direction: column; align-items: center; max-width: 330px; width: 90%;
+            animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .game-over-box h1 { font-size: 32px; color: #ff3333; margin-bottom: 6px; text-shadow: 2px 2px 6px rgba(0,0,0,0.9); }
+        .game-over-box p { font-size: 17px; font-weight: bold; color: #ffeb3b; margin-bottom: 14px; text-shadow: 1px 1px 5px rgba(0,0,0,0.9); }
+        .btn-restart {
+            background: url('https://raw.githubusercontent.com/mauryavikrant57-star/My-game-assets/refs/heads/main/1000036599-removebg-preview.png') no-repeat center;
+            background-size: contain; width: 220px; height: 72px; border: none; cursor: pointer;
+            filter: drop-shadow(0px 8px 16px rgba(0,0,0,0.8)); margin-top: 8px;
+            transition: transform 0.1s;
+        }
+        .btn-restart:active { transform: scale(0.95); }
+
+        #admob-resume-overlay {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(13, 17, 26, 0.75);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            z-index: 20000;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: #ffffff;
+            text-align: center;
+            padding: 20px;
+        }
+        .resume-card {
+            background: linear-gradient(145deg, rgba(30, 35, 50, 0.85), rgba(13, 17, 26, 0.9));
+            border: 2px solid rgba(255, 235, 59, 0.6);
+            border-radius: 24px;
+            padding: 30px 40px;
+            box-shadow: 0 0 40px rgba(255, 235, 59, 0.4), inset 0 0 20px rgba(255,255,255,0.1);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .resume-card h2 {
+            font-size: 28px;
+            color: #ffeb3b;
+            margin-bottom: 15px;
+            text-shadow: 2px 2px 6px rgba(0,0,0,0.9);
+        }
+        #countdown-display {
+            font-size: 52px;
+            font-weight: bold;
+            color: #00ffcc;
+            margin-bottom: 20px;
+            text-shadow: 0 0 20px rgba(0,255,204,0.6);
+        }
+        .btn-glass-resume {
+            background: linear-gradient(135deg, #ff9800, #ef6c00);
+            border: 2px solid #fff;
+            color: white;
+            font-size: 18px;
+            font-weight: bold;
+            padding: 12px 32px;
+            border-radius: 16px;
+            cursor: pointer;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.6);
+            transition: transform 0.1s, background 0.2s;
+        }
+        .btn-glass-resume:active { transform: scale(0.92); }
+    </style>
+</head>
+<body>
+
+<div id="game-container">
+    <div id="loader-screen">
+        <div class="loader-rays"></div>
+
+        <!-- Sparkling Stars Background -->
+        <div class="loader-star" style="top: 9%; left: 15%; width: 16px; height: 16px; animation-delay: 0.1s;"></div>
+        <div class="loader-star" style="top: 17%; left: 82%; width: 20px; height: 20px; animation-delay: 0.5s;"></div>
+        <div class="loader-star" style="top: 30%; left: 10%; width: 15px; height: 15px; animation-delay: 0.9s;"></div>
+        <div class="loader-star" style="top: 42%; left: 86%; width: 22px; height: 22px; animation-delay: 0.3s;"></div>
+        <div class="loader-star" style="top: 55%; left: 12%; width: 18px; height: 18px; animation-delay: 0.7s;"></div>
+        <div class="loader-star" style="top: 69%; left: 80%; width: 21px; height: 21px; animation-delay: 0.2s;"></div>
+        <div class="loader-star" style="top: 83%; left: 18%; width: 19px; height: 19px; animation-delay: 0.6s;"></div>
+        <div class="loader-star" style="top: 76%; left: 54%; width: 17px; height: 17px; animation-delay: 1.1s;"></div>
+
+        <!-- Thick Breaking Shooting Stars Moving in Different Directions Across the Loader -->
+        <div class="thick-shooting-star meteor-path-diag-down-right" style="top: 9%; left: 8%; animation-delay: 0.1s;">
+            <div class="meteor-core-streak"></div>
+            <div class="meteor-head-flare"></div>
+            <div class="meteor-shard shard-1"></div>
+            <div class="meteor-shard shard-2"></div>
+            <div class="meteor-shard shard-3"></div>
+            <div class="meteor-shard shard-4"></div>
+        </div>
+        <div class="thick-shooting-star meteor-path-diag-down-left" style="top: 18%; left: 56%; animation-delay: 1.0s;">
+            <div class="meteor-core-streak"></div>
+            <div class="meteor-head-flare"></div>
+            <div class="meteor-shard shard-1"></div>
+            <div class="meteor-shard shard-2"></div>
+            <div class="meteor-shard shard-3"></div>
+            <div class="meteor-shard shard-4"></div>
+        </div>
+        <div class="thick-shooting-star meteor-path-sweep-across" style="top: 54%; left: 10%; animation-delay: 1.5s;">
+            <div class="meteor-core-streak"></div>
+            <div class="meteor-head-flare"></div>
+            <div class="meteor-shard shard-1"></div>
+            <div class="meteor-shard shard-2"></div>
+            <div class="meteor-shard shard-3"></div>
+            <div class="meteor-shard shard-4"></div>
+        </div>
+        <div class="thick-shooting-star meteor-path-diag-down-left" style="top: 63%; left: 55%; animation-delay: 0.6s;">
+            <div class="meteor-core-streak"></div>
+            <div class="meteor-head-flare"></div>
+            <div class="meteor-shard shard-1"></div>
+            <div class="meteor-shard shard-2"></div>
+            <div class="meteor-shard shard-3"></div>
+            <div class="meteor-shard shard-4"></div>
+        </div>
+        <div class="thick-shooting-star meteor-path-diag-down-right" style="bottom: 9%; left: 24%; animation-delay: 1.9s;">
+            <div class="meteor-core-streak"></div>
+            <div class="meteor-head-flare"></div>
+            <div class="meteor-shard shard-1"></div>
+            <div class="meteor-shard shard-2"></div>
+            <div class="meteor-shard shard-3"></div>
+            <div class="meteor-shard shard-4"></div>
+        </div>
+
+        <!-- Bottom-Right Four-Point Star Sparkle -->
+        <div class="bottom-right-sparkle"></div>
+
+        <div class="crystal-ring-box">
+            <svg class="crystal-svg-ring" viewBox="0 0 140 140">
+                <defs>
+                    <!-- Strict circular clip path so every 3D crystal prism & highlight stays inside the round logo -->
+                    <clipPath id="strictCircularLogoClip">
+                        <circle cx="70" cy="70" r="62" />
+                    </clipPath>
+
+                    <!-- Blue-dominant crystal gradients with tasteful cyan, soft-gold, and white facets -->
+                    <linearGradient id="prismBrightCyan" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stop-color="#ffffff" stop-opacity="1"/>
+                        <stop offset="30%" stop-color="#7dd3fc" stop-opacity="0.98"/>
+                        <stop offset="72%" stop-color="#0284c7" stop-opacity="0.96"/>
+                        <stop offset="100%" stop-color="#1e3a8a" stop-opacity="0.94"/>
+                    </linearGradient>
+                    <linearGradient id="prismGoldFacet" x1="100%" y1="0%" x2="0%" y2="100%">
+                        <stop offset="0%" stop-color="#ffffff" stop-opacity="0.98"/>
+                        <stop offset="34%" stop-color="#fde68a" stop-opacity="0.92"/>
+                        <stop offset="75%" stop-color="#38bdf8" stop-opacity="0.88"/>
+                        <stop offset="100%" stop-color="#1d4ed8" stop-opacity="0.9"/>
+                    </linearGradient>
+                    <linearGradient id="prismElectricBlue" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stop-color="#e0f2fe" stop-opacity="0.98"/>
+                        <stop offset="35%" stop-color="#38bdf8" stop-opacity="0.96"/>
+                        <stop offset="75%" stop-color="#2563eb" stop-opacity="0.94"/>
+                        <stop offset="100%" stop-color="#0f172a" stop-opacity="0.92"/>
+                    </linearGradient>
+                    <linearGradient id="prismDeepBlueTeal" x1="100%" y1="100%" x2="0%" y2="0%">
+                        <stop offset="0%" stop-color="#bae6fd" stop-opacity="0.96"/>
+                        <stop offset="35%" stop-color="#22d3ee" stop-opacity="0.92"/>
+                        <stop offset="75%" stop-color="#1d4ed8" stop-opacity="0.92"/>
+                        <stop offset="100%" stop-color="#0c193b" stop-opacity="0.92"/>
+                    </linearGradient>
+                    <linearGradient id="prismDeepShadow" x1="0%" y1="100%" x2="100%" y2="0%">
+                        <stop offset="0%" stop-color="#040d24" stop-opacity="0.98"/>
+                        <stop offset="55%" stop-color="#0f295e" stop-opacity="0.88"/>
+                        <stop offset="100%" stop-color="#38bdf8" stop-opacity="0.58"/>
+                    </linearGradient>
+                    <linearGradient id="prismBevelRim" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stop-color="#ffffff" stop-opacity="1"/>
+                        <stop offset="24%" stop-color="#7dd3fc" stop-opacity="0.98"/>
+                        <stop offset="50%" stop-color="#3b82f6" stop-opacity="0.96"/>
+                        <stop offset="76%" stop-color="#fde68a" stop-opacity="0.88"/>
+                        <stop offset="90%" stop-color="#22d3ee" stop-opacity="0.96"/>
+                        <stop offset="100%" stop-color="#ffffff" stop-opacity="1"/>
+                    </linearGradient>
+                    <linearGradient id="crystalRoofLeft" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stop-color="#ffffff" stop-opacity="0.99"/>
+                        <stop offset="38%" stop-color="#7dd3fc" stop-opacity="0.94"/>
+                        <stop offset="100%" stop-color="#1d4ed8" stop-opacity="0.9"/>
+                    </linearGradient>
+                    <linearGradient id="crystalRoofRight" x1="100%" y1="0%" x2="0%" y2="100%">
+                        <stop offset="0%" stop-color="#fef9c3" stop-opacity="0.96"/>
+                        <stop offset="38%" stop-color="#38bdf8" stop-opacity="0.92"/>
+                        <stop offset="100%" stop-color="#1e40af" stop-opacity="0.9"/>
+                    </linearGradient>
+                    <linearGradient id="crystalWallLeft" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stop-color="#e0f2fe" stop-opacity="0.78"/>
+                        <stop offset="55%" stop-color="#0284c7" stop-opacity="0.52"/>
+                        <stop offset="100%" stop-color="#172554" stop-opacity="0.82"/>
+                    </linearGradient>
+                    <linearGradient id="crystalWallRight" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stop-color="#a5f3fc" stop-opacity="0.74"/>
+                        <stop offset="60%" stop-color="#2563eb" stop-opacity="0.5"/>
+                        <stop offset="100%" stop-color="#091330" stop-opacity="0.86"/>
+                    </linearGradient>
+                    <radialGradient id="crystalWindowGlow" cx="50%" cy="50%" r="50%">
+                        <stop offset="0%" stop-color="#ffffff" stop-opacity="1"/>
+                        <stop offset="48%" stop-color="#7dd3fc" stop-opacity="0.95"/>
+                        <stop offset="100%" stop-color="#2563eb" stop-opacity="0.65"/>
+                    </radialGradient>
+                    <radialGradient id="glassCoreGlow" cx="50%" cy="50%" r="50%">
+                        <stop offset="0%" stop-color="#040b20" stop-opacity="0.98"/>
+                        <stop offset="62%" stop-color="#0b2256" stop-opacity="0.78"/>
+                        <stop offset="86%" stop-color="#38bdf8" stop-opacity="0.34"/>
+                        <stop offset="100%" stop-color="#000000" stop-opacity="0"/>
+                    </radialGradient>
+                </defs>
+
+                <!-- Strictly Circular Container Group -->
+                <g clip-path="url(#strictCircularLogoClip)">
+                    <!-- Clean Hollow Center with Blue Electric Rim Glow -->
+                    <circle cx="70" cy="70" r="46" fill="url(#glassCoreGlow)" />
+                    <circle cx="70" cy="70" r="45.5" fill="none" stroke="rgba(125, 211, 252, 0.5)" stroke-width="1.4" />
+                    <circle cx="70" cy="70" r="60.5" fill="none" stroke="rgba(186, 230, 253, 0.24)" stroke-width="1.2" />
+
+                    <!-- Multi-Faceted 3D Blue Crystal House Inside Circular Frame -->
+                    <g class="crystal-house-core">
+                        <!-- Crystal Chimney -->
+                        <polygon points="84,45 91,42 91,56 84,59" fill="url(#crystalRoofRight)" stroke="#e0f2fe" stroke-width="1" stroke-linejoin="round" />
+                        <polygon points="81,43.5 84,45 84,59 81,57.5" fill="url(#crystalRoofLeft)" stroke="#bae6fd" stroke-width="0.9" stroke-linejoin="round" />
+                        <ellipse cx="86" cy="43.2" rx="5.2" ry="1.8" fill="#ffffff" opacity="0.88" />
+
+                        <!-- 3D Gabled Roof Facets -->
+                        <polygon points="70,38 41,62 70,68" fill="url(#crystalRoofLeft)" stroke="#ffffff" stroke-width="1.25" stroke-linejoin="round" />
+                        <polygon points="70,38 99,62 70,68" fill="url(#crystalRoofRight)" stroke="#e0f2fe" stroke-width="1.25" stroke-linejoin="round" />
+                        <polygon points="70,44 48,61.5 70,66" fill="rgba(224,242,254,0.24)" />
+                        <polygon points="70,44 92,61.5 70,66" fill="rgba(254,249,195,0.16)" />
+
+                        <!-- Left 3D Translucent Blue Crystalline Wall & Inner Facets -->
+                        <polygon points="46,63.5 70,68 70,95 46,89" fill="url(#crystalWallLeft)" stroke="#7dd3fc" stroke-width="1.2" stroke-linejoin="round" />
+                        <polygon points="46,63.5 58,65.8 58,92 46,89" fill="rgba(255,255,255,0.16)" />
+                        <line x1="70" y1="68" x2="46" y2="89" stroke="rgba(224,242,254,0.52)" stroke-width="0.9" />
+
+                        <!-- Right 3D Translucent Blue Crystalline Wall & Inner Facets -->
+                        <polygon points="94,63.5 70,68 70,95 94,89" fill="url(#crystalWallRight)" stroke="#93c5fd" stroke-width="1.2" stroke-linejoin="round" />
+                        <polygon points="82,65.8 94,63.5 94,89 82,92" fill="rgba(125,211,252,0.14)" />
+                        <line x1="70" y1="68" x2="94" y2="89" stroke="rgba(186,230,253,0.48)" stroke-width="0.9" />
+
+                        <!-- Glowing Blue-Cyan Crystal Windows -->
+                        <polygon points="51.5,71 61,72.8 61,81.5 51.5,79.6" fill="url(#crystalWindowGlow)" stroke="#ffffff" stroke-width="1" />
+                        <line x1="56.25" y1="71.9" x2="56.25" y2="80.5" stroke="#1d4ed8" stroke-width="0.95" />
+                        <line x1="51.5" y1="75.3" x2="61" y2="77.1" stroke="#1d4ed8" stroke-width="0.95" />
+
+                        <polygon points="79,72.8 88.5,71 88.5,79.6 79,81.5" fill="url(#crystalWindowGlow)" stroke="#ffffff" stroke-width="1" />
+                        <line x1="83.75" y1="71.9" x2="83.75" y2="80.5" stroke="#1d4ed8" stroke-width="0.95" />
+                        <line x1="79" y1="77.1" x2="88.5" y2="75.3" stroke="#1d4ed8" stroke-width="0.95" />
+
+                        <!-- Center Crystal Doorway -->
+                        <path d="M 65.5 94 L 65.5 81.5 A 4.5 4.5 0 0 1 74.5 81.5 L 74.5 94 Z" fill="rgba(56, 189, 248, 0.42)" stroke="#ffffff" stroke-width="1.1" />
+                        <line x1="70" y1="77.5" x2="70" y2="94" stroke="#e0f2fe" stroke-width="0.9" opacity="0.88" />
+
+                        <!-- Luminous Crystal Base Plinth -->
+                        <polygon points="43,89 70,95 97,89 70,98.5" fill="url(#prismBevelRim)" stroke="#ffffff" stroke-width="1" stroke-linejoin="round" />
+                    </g>
+
+                    <!-- Electric Lightning Filaments & Star-Thread Veins Woven Around Crystal House & Ring -->
+                    <g class="crystal-electric-threads" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M 30 62 Q 46 34 70 28 Q 95 34 110 62" stroke="rgba(186, 230, 253, 0.58)" stroke-width="0.95" stroke-dasharray="3 3" />
+                        <path d="M 32 82 Q 48 108 70 112 Q 92 108 108 82" stroke="rgba(125, 211, 252, 0.55)" stroke-width="0.95" stroke-dasharray="2.5 3.5" />
+                        <path d="M 70 38 L 54 27 L 43 33" stroke="#e0f2fe" stroke-width="1.35" />
+                        <path d="M 70 38 L 87 26 L 99 32" stroke="#7dd3fc" stroke-width="1.35" />
+                        <path d="M 41 62 L 26 57 L 20 64" stroke="#38bdf8" stroke-width="1.2" />
+                        <path d="M 99 62 L 114 57 L 120 65" stroke="#7dd3fc" stroke-width="1.2" />
+                        <path d="M 46 89 L 31 97 L 26 91" stroke="#bae6fd" stroke-width="1.15" />
+                        <path d="M 94 89 L 109 97 L 114 91" stroke="#38bdf8" stroke-width="1.15" />
+                        <circle cx="43" cy="33" r="1.4" fill="#ffffff" />
+                        <circle cx="99" cy="32" r="1.4" fill="#ffffff" />
+                        <circle cx="20" cy="64" r="1.3" fill="#7dd3fc" />
+                        <circle cx="120" cy="65" r="1.3" fill="#bae6fd" />
+                    </g>
+
+                    <!-- Outer 3D Circular Faceted Blue Crystal Prism Ring -->
+                    <g class="crystal-outer-layer">
+                        <circle cx="70" cy="70" r="53.5" fill="none" stroke="url(#prismDeepShadow)" stroke-width="13.5" opacity="0.92" />
+                        <circle cx="70" cy="70" r="53.5" fill="none" stroke="url(#prismBevelRim)" stroke-width="8.6" />
+
+                        <g stroke-width="5.2" stroke-linecap="butt" fill="none">
+                            <path d="M 70 16.5 A 53.5 53.5 0 0 1 96.75 23.67" stroke="#ffffff" />
+                            <path d="M 96.75 23.67 A 53.5 53.5 0 0 1 116.33 43.25" stroke="url(#prismBrightCyan)" />
+                            <path d="M 116.33 43.25 A 53.5 53.5 0 0 1 123.5 70" stroke="url(#prismGoldFacet)" />
+                            <path d="M 123.5 70 A 53.5 53.5 0 0 1 116.33 96.75" stroke="#38bdf8" />
+                            <path d="M 116.33 96.75 A 53.5 53.5 0 0 1 96.75 116.33" stroke="url(#prismElectricBlue)" />
+                            <path d="M 96.75 116.33 A 53.5 53.5 0 0 1 70 123.5" stroke="#2563eb" />
+                            <path d="M 70 123.5 A 53.5 53.5 0 0 1 43.25 116.33" stroke="url(#prismDeepBlueTeal)" />
+                            <path d="M 43.25 116.33 A 53.5 53.5 0 0 1 23.67 96.75" stroke="#0284c7" />
+                            <path d="M 23.67 96.75 A 53.5 53.5 0 0 1 16.5 70" stroke="url(#prismBrightCyan)" />
+                            <path d="M 16.5 70 A 53.5 53.5 0 0 1 23.67 43.25" stroke="#60a5fa" />
+                            <path d="M 23.67 43.25 A 53.5 53.5 0 0 1 43.25 23.67" stroke="url(#prismGoldFacet)" />
+                            <path d="M 43.25 23.67 A 53.5 53.5 0 0 1 70 16.5" stroke="#ffffff" />
+                        </g>
+
+                        <circle cx="70" cy="70" r="57.6" fill="none" stroke="rgba(224, 242, 254, 0.68)" stroke-width="1.2" />
+                        <circle cx="70" cy="70" r="49.2" fill="none" stroke="rgba(125, 211, 252, 0.62)" stroke-width="1.1" />
+                    </g>
+
+                    <!-- Inner Counter-Rotating 3D Circular Crystal Ring -->
+                    <g class="crystal-inner-layer">
+                        <circle cx="70" cy="70" r="47.2" fill="none" stroke="url(#prismBrightCyan)" stroke-width="3.6" stroke-dasharray="14 7 22 7" opacity="0.94" />
+
+                        <g stroke-width="1.7" opacity="0.88">
+                            <line x1="70" y1="46.2" x2="70" y2="60.8" stroke="#ffffff" />
+                            <line x1="81.9" y1="49.4" x2="89.25" y2="62.1" stroke="#7dd3fc" />
+                            <line x1="90.6" y1="58.1" x2="103.3" y2="65.45" stroke="#fde68a" />
+                            <line x1="93.8" y1="70" x2="108.4" y2="70" stroke="#38bdf8" />
+                            <line x1="90.6" y1="81.9" x2="103.3" y2="89.25" stroke="#60a5fa" />
+                            <line x1="81.9" y1="90.6" x2="89.25" y2="103.3" stroke="#3b82f6" />
+                            <line x1="70" y1="93.8" x2="70" y2="108.4" stroke="#22d3ee" />
+                            <line x1="58.1" y1="90.6" x2="50.75" y2="103.3" stroke="#38bdf8" />
+                            <line x1="49.4" y1="81.9" x2="36.7" y2="89.25" stroke="#7dd3fc" />
+                            <line x1="46.2" y1="70" x2="31.6" y2="70" stroke="#bae6fd" />
+                            <line x1="49.4" y1="58.1" x2="36.7" y2="50.75" stroke="#fde68a" />
+                            <line x1="58.1" y1="49.4" x2="50.75" y2="36.7" stroke="#ffffff" />
+                        </g>
+                    </g>
+
+                    <!-- Circular Specular Sparkle Highlights Inside the Ring -->
+                    <g class="crystal-specular-glint">
+                        <g transform="translate(89, 22)">
+                            <polygon points="0,-7.5 1.8,-1.8 7.5,0 1.8,1.8 0,7.5 -1.8,1.8 -7.5,0 -1.8,-1.8" fill="#ffffff" />
+                            <circle cx="0" cy="0" r="1.7" fill="#38bdf8" />
+                        </g>
+                        <g transform="translate(115, 70)">
+                            <polygon points="0,-6.5 1.6,-1.6 6.5,0 1.6,1.6 0,6.5 -1.6,1.6 -6.5,0 -1.6,-1.6" fill="#e0f2fe" />
+                            <circle cx="0" cy="0" r="1.5" fill="#ffffff" />
+                        </g>
+                    </g>
+                </g>
+            </svg>
+        </div>
+        
+        <div class="loader-text-box">
+            Loading Game<span class="dots"><span>.</span><span>.</span><span>.</span></span>
+        </div>
+        
+        <!-- Electric Blue Title with Subtle Gold & White Highlights and Filament Star-Threads -->
+        <svg class="game-title-svg" viewBox="0 0 560 86">
+            <defs>
+                <linearGradient id="electricBlueTitleFill" x1="0%" y1="0%" x2="0%" y2="100%">
+                    <stop offset="0%" stop-color="#ffffff"/>
+                    <stop offset="22%" stop-color="#bae6fd"/>
+                    <stop offset="56%" stop-color="#38bdf8"/>
+                    <stop offset="86%" stop-color="#2563eb"/>
+                    <stop offset="100%" stop-color="#93c5fd"/>
+                </linearGradient>
+                <linearGradient id="electricSubtleGoldAccent" x1="0%" y1="0%" x2="100%" y2="0%">
+                    <stop offset="0%" stop-color="#7dd3fc"/>
+                    <stop offset="50%" stop-color="#fef08a"/>
+                    <stop offset="100%" stop-color="#7dd3fc"/>
+                </linearGradient>
+                <radialGradient id="titleStarFlare" cx="50%" cy="50%" r="50%">
+                    <stop offset="0%" stop-color="#ffffff" stop-opacity="1"/>
+                    <stop offset="48%" stop-color="#38bdf8" stop-opacity="0.78"/>
+                    <stop offset="100%" stop-color="#38bdf8" stop-opacity="0"/>
+                </radialGradient>
+            </defs>
+
+            <ellipse cx="280" cy="48" rx="236" ry="22" fill="rgba(56, 189, 248, 0.14)" />
+
+            <g fill="none" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M 38 48 Q 145 26 280 28 Q 415 26 522 48" stroke="rgba(186, 230, 253, 0.55)" stroke-width="1" stroke-dasharray="4 3.5" />
+                <path d="M 48 62 Q 160 74 280 71 Q 400 74 512 62" stroke="rgba(125, 211, 252, 0.45)" stroke-width="0.95" stroke-dasharray="3 4" />
+                <path d="M 52 46 L 34 35 L 22 41 L 12 33" stroke="#7dd3fc" stroke-width="1.5" />
+                <path d="M 508 46 L 526 35 L 538 42 L 548 34" stroke="#bae6fd" stroke-width="1.5" />
+                <path d="M 280 27 L 274 15 L 284 10" stroke="#e0f2fe" stroke-width="1.25" />
+            </g>
+
+            <text x="50%" y="56" text-anchor="middle" font-family="'Times New Roman', Georgia, serif" font-size="31" font-weight="900" letter-spacing="2.2" fill="none" stroke="#00d2ff" stroke-width="4.6" stroke-linejoin="round">AERO DASH - PRO EDITION</text>
+            <text x="50%" y="56" text-anchor="middle" font-family="'Times New Roman', Georgia, serif" font-size="31" font-weight="900" letter-spacing="2.2" fill="url(#electricBlueTitleFill)" stroke="#081638" stroke-width="1.2">AERO DASH - PRO EDITION</text>
+            <text x="50%" y="56" text-anchor="middle" font-family="'Times New Roman', Georgia, serif" font-size="31" font-weight="900" letter-spacing="2.2" fill="none" stroke="url(#electricSubtleGoldAccent)" stroke-width="0.55" opacity="0.72">AERO DASH - PRO EDITION</text>
+
+            <g transform="translate(116, 26)">
+                <polygon points="0,-9.5 2.2,-2.2 9.5,0 2.2,2.2 0,9.5 -2.2,2.2 -9.5,0 -2.2,-2.2" fill="url(#titleStarFlare)" />
+                <circle cx="0" cy="0" r="1.8" fill="#ffffff" />
+            </g>
+            <g transform="translate(362, 24)">
+                <polygon points="0,-8.5 2,-2 8.5,0 2,2 0,8.5 -2,2 -8.5,0 -2,-2" fill="url(#titleStarFlare)" />
+                <circle cx="0" cy="0" r="1.6" fill="#fef08a" />
+            </g>
+            <g transform="translate(508, 56)">
+                <polygon points="0,-11 2.6,-2.6 11,0 2.6,2.6 0,11 -2.6,2.6 -11,0 -2.6,-2.6" fill="url(#titleStarFlare)" />
+                <circle cx="0" cy="0" r="2" fill="#ffffff" />
+            </g>
+        </svg>
+    </div>
+
+    <div id="admob-resume-overlay" class="hidden">
+        <div class="resume-card">
+            <h2>Game Paused</h2>
+            <div id="countdown-display">3</div>
+            <button class="btn-glass-resume" onclick="playClickSound(); manualResumeGame()">Resume</button>
+        </div>
+    </div>
+
+    <div id="main-menu" class="screen hidden">
+        <div style="position: absolute; top: 16px; right: 15px; z-index: 1000;">
+            <div class="coin-display" id="menu-coins">0</div>
+        </div>
+        <div class="free-spin-icon" onclick="playClickSound(); openSpinWheel()"></div>
+        <button class="btn-play" onclick="playClickSound(); goToTapToStart()"></button>
+        <button class="btn-privacy-policy" onclick="playClickSound(); openPrivacyPolicy()"></button>
+        <button class="btn-shop-menu" onclick="playClickSound(); openShopScreen()"></button>
+    </div>
+
+    <div id="shop-screen" class="hidden">
+        <div class="shop-header-bar">
+            <button class="shop-back-btn" onclick="playClickSound(); closeShopScreen()">&#8592; Back</button>
+            <div class="coin-display" id="shop-coins">0</div>
+        </div>
+
+        <div class="shop-3d-heading shop-3d-character">CHARACTER</div>
+        <div class="shop-row">
+            <div class="shop-card" id="shop-char-blue" onclick="handleShopCharacterClick('blue')">
+                <div class="shop-preview-box">
+                    <img class="shop-preview-bird" src="https://raw.githubusercontent.com/mauryavikrant57-star/My-game-assets/refs/heads/main/IMG_20260803_110119.png" alt="Blue Bird">
+                </div>
+                <div class="shop-item-title">Blue Bird</div>
+                <button type="button" class="shop-action-badge badge-active" id="badge-char-blue">Equipped</button>
+            </div>
+
+            <div class="shop-card" id="shop-char-falcon" onclick="handleShopCharacterClick('falcon')">
+                <div class="shop-preview-box">
+                    <img class="shop-preview-bird" id="falcon-preview-img" src="https://raw.githubusercontent.com/mauryavikrant57-star/My-game-assets/17e8b48d0c2540b9447fcc425f3be2c93822d4d3/1000044845-removebg-preview.png" alt="Cyber Falcon">
+                </div>
+                <div class="shop-item-title">Cyber Falcon</div>
+                <button type="button" class="shop-action-badge badge-locked" id="badge-char-falcon">&#128274; 20000 Coins</button>
+            </div>
+        </div>
+
+        <div class="shop-row">
+            <div class="shop-card" id="shop-char-phoenix" onclick="handleShopCharacterClick('phoenix')">
+                <div class="shop-preview-box">
+                    <img class="shop-preview-bird" src="https://raw.githubusercontent.com/mauryavikrant57-star/My-game-assets/refs/heads/main/1000044885-removebg-preview.png" alt="Golden Phoenix">
+                </div>
+                <div class="shop-item-title">Golden Phoenix</div>
+                <button type="button" class="shop-action-badge badge-locked" id="badge-char-phoenix">&#128274; 25000 Coins</button>
+            </div>
+
+            <div class="shop-card" id="shop-char-dragon" onclick="handleShopCharacterClick('dragon')">
+                <div class="shop-preview-box">
+                    <img class="shop-preview-bird" src="https://raw.githubusercontent.com/mauryavikrant57-star/My-game-assets/refs/heads/main/1000044887-removebg-preview.png" alt="Neon Dragon">
+                </div>
+                <div class="shop-item-title">Neon Dragon</div>
+                <button type="button" class="shop-action-badge badge-locked" id="badge-char-dragon">&#128274; 30000 Coins</button>
+            </div>
+        </div>
+
+        <div class="shop-row">
+            <div class="shop-card" id="shop-char-hawk" onclick="handleShopCharacterClick('hawk')">
+                <div class="shop-preview-box">
+                    <img class="shop-preview-bird" src="https://raw.githubusercontent.com/mauryavikrant57-star/My-game-assets/refs/heads/main/1000044889-removebg-preview.png" alt="Shadow Hawk">
+                </div>
+                <div class="shop-item-title">Shadow Hawk</div>
+                <button type="button" class="shop-action-badge badge-locked" id="badge-char-hawk">&#128274; 35000 Coins</button>
+            </div>
+
+            <div class="shop-card" id="shop-char-eagle" onclick="handleShopCharacterClick('eagle')">
+                <div class="shop-preview-box">
+                    <img class="shop-preview-bird" src="https://raw.githubusercontent.com/mauryavikrant57-star/My-game-assets/refs/heads/main/1000044891-removebg-preview.png" alt="Crystal Eagle">
+                </div>
+                <div class="shop-item-title">Crystal Eagle</div>
+                <button type="button" class="shop-action-badge badge-locked" id="badge-char-eagle">&#128274; 40000 Coins</button>
+            </div>
+        </div>
+
+        <div class="shop-3d-heading shop-3d-background">BACKGROUND</div>
+        <div class="shop-row">
+            <div class="shop-card" id="shop-bg-classic" onclick="handleShopBackgroundClick('classic')">
+                <div class="shop-preview-box">
+                    <img class="shop-preview-bg" src="https://raw.githubusercontent.com/mauryavikrant57-star/My-game-assets/refs/heads/main/1783854852475.png" alt="Classic BG">
+                </div>
+                <div class="shop-item-title">Classic BG</div>
+                <button type="button" class="shop-action-badge badge-active" id="badge-bg-classic">Equipped</button>
+            </div>
+
+            <div class="shop-card" id="shop-bg-neon" onclick="handleShopBackgroundClick('neon')">
+                <div class="shop-preview-box">
+                    <img class="shop-preview-bg" src="https://raw.githubusercontent.com/mauryavikrant57-star/My-game-assets/refs/heads/main/1795140725496.png" alt="Neon City">
+                </div>
+                <div class="shop-item-title">Neon City</div>
+                <button type="button" class="shop-action-badge badge-locked" id="badge-bg-neon">&#128274; 15000 Coins</button>
+            </div>
+        </div>
+
+        <div class="shop-row">
+            <div class="shop-card" id="shop-bg-sunset" onclick="handleShopBackgroundClick('sunset')">
+                <div class="shop-preview-box">
+                    <img class="shop-preview-bg" src="https://raw.githubusercontent.com/mauryavikrant57-star/My-game-assets/refs/heads/main/1795140767249.png" alt="Sunset Valley">
+                </div>
+                <div class="shop-item-title">Sunset Valley</div>
+                <button type="button" class="shop-action-badge badge-locked" id="badge-bg-sunset">&#128274; 20000 Coins</button>
+            </div>
+
+            <div class="shop-card" id="shop-bg-galaxy" onclick="handleShopBackgroundClick('galaxy')">
+                <div class="shop-preview-box">
+                    <img class="shop-preview-bg" src="https://raw.githubusercontent.com/mauryavikrant57-star/My-game-assets/refs/heads/main/1795255483850.png" alt="Space Galaxy">
+                </div>
+                <div class="shop-item-title">Space Galaxy</div>
+                <button type="button" class="shop-action-badge badge-locked" id="badge-bg-galaxy">&#128274; 25000 Coins</button>
+            </div>
+        </div>
+
+        <div class="shop-row">
+            <div class="shop-card" id="shop-bg-lava" onclick="handleShopBackgroundClick('lava')">
+                <div class="shop-preview-box">
+                    <img class="shop-preview-bg" src="https://raw.githubusercontent.com/mauryavikrant57-star/My-game-assets/refs/heads/main/1795140865212.png" alt="Lava World">
+                </div>
+                <div class="shop-item-title">Lava World</div>
+                <button type="button" class="shop-action-badge badge-locked" id="badge-bg-lava">&#128274; 30000 Coins</button>
+            </div>
+
+            <div class="shop-card" id="shop-bg-ice" onclick="handleShopBackgroundClick('ice')">
+                <div class="shop-preview-box">
+                    <img class="shop-preview-bg" src="https://raw.githubusercontent.com/mauryavikrant57-star/My-game-assets/refs/heads/main/1795140903135.png" alt="Ice Kingdom">
+                </div>
+                <div class="shop-item-title">Ice Kingdom</div>
+                <button type="button" class="shop-action-badge badge-locked" id="badge-bg-ice">&#128274; 35000 Coins</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="shop-success-toast" class="hidden">
+        <span class="success-white-text">Successfully</span>
+        <span class="success-bold-green-tick">&#10004;</span>
+    </div>
+
+    <div id="privacy-policy-screen" class="screen hidden" style="background: rgba(13, 17, 26, 0.95); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); color: #ffffff; padding: 20px; overflow-y: auto; text-align: left; z-index: 1500; align-items: stretch; border: 1px solid rgba(255, 255, 255, 0.15);">
+        <div style="position: sticky; top: 0; padding: 12px 0px; display: flex; align-items: center; z-index: 1501; margin-bottom: 15px; background: rgba(13, 17, 26, 0.95);">
+            <button onclick="playClickSound(); closePrivacyPolicy()" style="background: linear-gradient(135deg, rgba(255,235,59,0.2), rgba(255,152,0,0.3)); border: 2px solid #ffeb3b; color: #ffeb3b; font-size: 16px; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 8px; padding: 8px 16px; border-radius: 12px; backdrop-filter: blur(6px); filter: drop-shadow(0px 4px 8px rgba(0,0,0,0.6)); transition: transform 0.1s;">
+                &#8592; Back
+            </button>
+        </div>
+        <div style="max-width: 600px; margin: 0 auto; padding-bottom: 40px;">
+            <h2 style="color: #ffeb3b; font-size: 24px; margin-bottom: 15px; text-align: center;">Privacy Policy</h2>
+            <p style="font-size: 14px; line-height: 1.6; margin-bottom: 15px;">Welcome to <strong>Aero Dash - Pro Edition</strong>. We respect your privacy and are committed to protecting your personal data.</p>
+            
+            <h3 style="color: #00e5ff; font-size: 16px; margin-top: 15px; margin-bottom: 5px;">1. Data Collection & Usage</h3>
+            <p style="font-size: 13px; line-height: 1.5; margin-bottom: 10px;">We do not store any of your personal data directly on the server. The game's score and coins remain securely saved only in your device's LocalStorage.</p>
+
+            <h3 style="color: #00e5ff; font-size: 16px; margin-top: 15px; margin-bottom: 5px;">2. Advertising & AdMob</h3>
+            <p style="font-size: 13px; line-height: 1.5; margin-bottom: 10px;">This app uses third-party advertising services like Google AdMob which may use device identifiers and cookies to show relevant ads.</p>
+
+            <h3 style="color: #00e5ff; font-size: 16px; margin-top: 15px; margin-bottom: 5px;">3. Children's Privacy</h3>
+            <p style="font-size: 13px; line-height: 1.5; margin-bottom: 10px;">We do not knowingly collect personally identifiable information from children under 13 years of age.</p>
+
+            <h3 style="color: #00e5ff; font-size: 16px; margin-top: 15px; margin-bottom: 5px;">4. Cookies & Analytics</h3>
+            <p style="font-size: 13px; line-height: 1.5; margin-bottom: 10px;">Basic cookies and local storage are used to enhance the gaming experience and track performance.</p>
+
+            <h3 style="color: #00e5ff; font-size: 16px; margin-top: 15px; margin-bottom: 5px;">5. Security Measures</h3>
+            <p style="font-size: 13px; line-height: 1.5; margin-bottom: 10px;">We implement appropriate technical and organizational security measures to protect your data.</p>
+
+            <h3 style="color: #00e5ff; font-size: 16px; margin-top: 15px; margin-bottom: 5px;">6. Changes to Policy</h3>
+            <p style="font-size: 13px; line-height: 1.5; margin-bottom: 10px;">We may update this privacy policy from time to time. Any changes will be notified on this page.</p>
+        </div>
+    </div>
+
+    <div id="tap-to-start-screen" class="screen hidden">
+        <button class="btn-tap-to-start" onclick="playClickSound(); launchGameAfterTap()"></button>
+    </div>
+
+    <div id="spin-modal" class="hidden">
+        <div class="wheel-box">
+            <div id="pointer"></div>
+            <div id="wheel"></div>
+        </div>
+        <p id="spin-limit-text" style="color: #ffeb3b; font-size: 15px; font-weight: bold; margin-bottom: 10px;">Spins Left Today: 2/2</p>
+        <button id="btn-spin-action" class="btn-spin-action-large" onclick="playClickSound(); spinWheelAction()"></button>
+        <button class="btn-spin-close" onclick="playClickSound(); closeSpinWheel()"></button>
+    </div>
+
+    <div id="alert-popup-modal" class="hidden">
+        <div class="popup-box">
+            <h3>⚠️ Notice</h3>
+            <p id="alert-message-text">Insufficient Coins!</p>
+            <button class="popup-btn btn-ok" onclick="playClickSound(); closeAlertPopup()">OK</button>
+        </div>
+    </div>
+
+    <div id="gameplay-screen" class="screen hidden" style="justify-content: flex-start;">
+        <div id="top-bar">
+            <button class="top-btn" id="btn-home" onclick="playClickSound(); goToHome()"></button>
+            <button class="top-btn" id="btn-sound" onclick="playClickSound(); toggleSound()"></button>
+            <div class="coin-display" id="score-coins">0</div>
+        </div>
+        <div id="game-score-board">Score: 0</div>
+        <canvas id="gameCanvas"></canvas>
+    </div>
+
+    <div id="game-over" class="screen hidden">
+        <div class="game-over-box">
+            <h1>Game Over!</h1>
+            <p id="final-score">Score: 0 | Coins: 0</p>
+            <button class="btn-restart" onclick="playClickSound(); restartGameDirect()"></button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Preload all required game assets and cache Image objects
+    const assetUrls = Array.from(new Set([
+        'https://raw.githubusercontent.com/mauryavikrant57-star/My-game-assets/refs/heads/main/1783854852475.png',
+        'https://raw.githubusercontent.com/mauryavikrant57-star/My-game-assets/refs/heads/main/1000036601-removebg-preview.png',
+        'https://raw.githubusercontent.com/mauryavikrant57-star/My-game-assets/refs/heads/main/1000037782-removebg-preview.png',
+        'https://raw.githubusercontent.com/mauryavikrant57-star/My-game-assets/refs/heads/main/1000037773-removebg-preview.png',
+        'https://raw.githubusercontent.com/mauryavikrant57-star/My-game-assets/refs/heads/main/1000036598-removebg-preview.png',
+        'https://raw.githubusercontent.com/mauryavikrant57-star/My-game-assets/refs/heads/main/IMG_20260803_111251.png',
+        'https://raw.githubusercontent.com/mauryavikrant57-star/My-game-assets/refs/heads/main/1000036597-removebg-preview.png',
+        'https://raw.githubusercontent.com/mauryavikrant57-star/My-game-assets/refs/heads/main/1000036216-removebg-preview.png',
+        'https://raw.githubusercontent.com/mauryavikrant57-star/My-game-assets/refs/heads/main/1000036600-removebg-preview.png',
+        'https://raw.githubusercontent.com/mauryavikrant57-star/My-game-assets/refs/heads/main/1000036596-removebg-preview.png',
+        'https://raw.githubusercontent.com/mauryavikrant57-star/My-game-assets/refs/heads/main/1000036583-removebg-preview.png',
+        'https://raw.githubusercontent.com/mauryavikrant57-star/My-game-assets/refs/heads/main/1000036484-removebg-preview.png',
+        'https://raw.githubusercontent.com/mauryavikrant57-star/My-game-assets/refs/heads/main/1000036599-removebg-preview.png',
+        'https://raw.githubusercontent.com/mauryavikrant57-star/My-game-assets/refs/heads/main/IMG_20260803_110119.png',
+        'https://raw.githubusercontent.com/mauryavikrant57-star/My-game-assets/refs/heads/main/IMG_20260803_110558.png',
+        'https://raw.githubusercontent.com/mauryavikrant57-star/My-game-assets/refs/heads/main/1000038121-removebg-preview.png',
+        'https://raw.githubusercontent.com/mauryavikrant57-star/My-game-assets/refs/heads/main/1000038122-removebg-preview.png',
+        'https://raw.githubusercontent.com/mauryavikrant57-star/My-game-assets/refs/heads/main/1000038123-removebg-preview.png',
+        'https://raw.githubusercontent.com/mauryavikrant57-star/My-game-assets/refs/heads/main/1000038124-removebg-preview.png',
+        'https://raw.githubusercontent.com/mauryavikrant57-star/My-game-assets/refs/heads/main/1000038152-removebg-preview.png',
+        'https://raw.githubusercontent.com/mauryavikrant57-star/My-game-assets/refs/heads/main/1000038126-removebg-preview.png',
+        'https://raw.githubusercontent.com/mauryavikrant57-star/My-game-assets/refs/heads/main/1000038132-removebg-preview.png',
+        'https://raw.githubusercontent.com/mauryavikrant57-star/My-game-assets/refs/heads/main/1000038133-removebg-preview.png',
+        'https://raw.githubusercontent.com/mauryavikrant57-star/My-game-assets/refs/heads/main/1000038134-removebg-preview.png',
+        'https://raw.githubusercontent.com/mauryavikrant57-star/My-game-assets/refs/heads/main/1000038135-removebg-preview.png',
+        'https://raw.githubusercontent.com/mauryavikrant57-star/My-game-assets/refs/heads/main/1000038136-removebg-preview.png',
+        'https://raw.githubusercontent.com/mauryavikrant57-star/My-game-assets/refs/heads/main/1000038137-removebg-preview.png',
+        'https://raw.githubusercontent.com/mauryavikrant57-star/My-game-assets/refs/heads/main/1000038138-removebg-preview.png',
+        'https://raw.githubusercontent.com/mauryavikrant57-star/My-game-assets/refs/heads/main/1000044863-removebg-preview.png',
+        'https://raw.githubusercontent.com/mauryavikrant57-star/My-game-assets/17e8b48d0c2540b9447fcc425f3be2c93822d4d3/1000044845-removebg-preview.png',
+        'https://raw.githubusercontent.com/mauryavikrant57-star/My-game-assets/3c6b880584ee6aa1252ba288aa565d267b301068/1000044848-removebg-preview.png',
+        'https://raw.githubusercontent.com/mauryavikrant57-star/My-game-assets/refs/heads/main/1795140725496.png',
+        'https://raw.githubusercontent.com/mauryavikrant57-star/My-game-assets/refs/heads/main/1795140767249.png',
+        'https://raw.githubusercontent.com/mauryavikrant57-star/My-game-assets/refs/heads/main/1795255483850.png',
+        'https://raw.githubusercontent.com/mauryavikrant57-star/My-game-assets/refs/heads/main/1795140865212.png',
+        'https://raw.githubusercontent.com/mauryavikrant57-star/My-game-assets/refs/heads/main/1795140903135.png',
+        'https://raw.githubusercontent.com/mauryavikrant57-star/My-game-assets/refs/heads/main/1000044885-removebg-preview.png',
+        'https://raw.githubusercontent.com/mauryavikrant57-star/My-game-assets/refs/heads/main/1000044886-removebg-preview.png',
+        'https://raw.githubusercontent.com/mauryavikrant57-star/My-game-assets/refs/heads/main/1000044887-removebg-preview.png',
+        'https://raw.githubusercontent.com/mauryavikrant57-star/My-game-assets/refs/heads/main/1000044888-removebg-preview.png',
+        'https://raw.githubusercontent.com/mauryavikrant57-star/My-game-assets/refs/heads/main/1000044889-removebg-preview.png',
+        'https://raw.githubusercontent.com/mauryavikrant57-star/My-game-assets/refs/heads/main/1000044890-removebg-preview.png',
+        'https://raw.githubusercontent.com/mauryavikrant57-star/My-game-assets/refs/heads/main/1000044891-removebg-preview.png',
+        'https://raw.githubusercontent.com/mauryavikrant57-star/My-game-assets/refs/heads/main/1000044892-removebg-preview.png'
+    ]));
+    
+    const imageCache = {};
+    function preloadAllAssetsWithMinDelay() {
+        return new Promise((resolve) => {
+            const startTime = Date.now();
+            const promises = assetUrls.map(url => {
+                return new Promise((res) => {
+                    try {
+                        const img = new Image();
+                        img.src = url;
+                        img.onload = () => { imageCache[url] = img; res(); };
+                        img.onerror = () => { res(); };
+                    } catch (err) {
+                        res();
+                    }
+                });
+            });
+
+            Promise.all(promises).then(() => {
+                const elapsedTime = Date.now() - startTime;
+                const minDelay = 1800;
+                if (elapsedTime < minDelay) {
+                    setTimeout(resolve, minDelay - elapsedTime);
+                } else {
+                    resolve();
+                }
+            });
+        });
+    }
+
+    function initializeAppGame() {
+        const loaderScreen = document.getElementById('loader-screen');
+        const mainMenu = document.getElementById('main-menu');
+
+        if (navigator.onLine) {
+            preloadAllAssetsWithMinDelay().then(() => {
+                loaderScreen.style.display = 'none';
+                mainMenu.classList.remove('hidden');
+            });
+        } else {
+            loaderScreen.innerHTML = "<h3 style='color:#ffeb3b;'>Internet connection is offline!</h3><p style='color:#888; font-size:13px; margin-top:8px;'>Please turn on your internet. The game will start instantly once online.</p>";
+        }
+    }
+
+    if (document.readyState === 'complete') {
+        initializeAppGame();
+    } else {
+        window.addEventListener('load', initializeAppGame);
+    }
+
+    window.addEventListener('online', function() {
+        location.reload(true);
+    });
+
+    window.addEventListener('offline', function() {
+        initializeAppGame();
+    });
+
+    // Web Audio API sound synthesis for ambience, BGM, UI clicks, and actions
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    let bgMusicInterval = null;
+    let premiumBgmInterval = null;
+    let premiumBgmStep = 0;
+
+    function playBackgroundAmbientMusic() {
+        if (!soundEnabled) return;
+        try {
+            if (audioCtx.state === 'suspended') { audioCtx.resume(); }
+            if (bgMusicInterval) clearInterval(bgMusicInterval);
+            bgMusicInterval = setInterval(() => {
+                if (!soundEnabled || !isGameRunning) return;
+                try {
+                    let now = audioCtx.currentTime;
+                    let osc = audioCtx.createOscillator();
+                    let gain = audioCtx.createGain();
+                    const windNotes = [174.61, 220.00, 261.63, 329.63, 349.23];
+                    let note = windNotes[Math.floor(Math.random() * windNotes.length)];
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(note, now);
+                    osc.frequency.linearRampToValueAtTime(note + 15, now + 2.0);
+                    gain.gain.setValueAtTime(0.001, now);
+                    gain.gain.linearRampToValueAtTime(0.012, now + 0.8);
+                    gain.gain.exponentialRampToValueAtTime(0.0001, now + 3.0);
+                    osc.connect(gain); gain.connect(audioCtx.destination);
+                    osc.start(now); osc.stop(now + 3.0);
+                } catch(e) {}
+            }, 2200);
+        } catch(e) {}
+    }
+    
+    function stopBackgroundAmbientMusic() {
+        if (bgMusicInterval) { clearInterval(bgMusicInterval); bgMusicInterval = null; }
+    }
+
+    function triggerPremiumBgmNote(stepIdx) {
+        if (!soundEnabled || !isGameRunning) return;
+        try {
+            if (audioCtx.state === 'suspended') { audioCtx.resume(); }
+            const now = audioCtx.currentTime;
+
+            const chordProgression = [
+                [261.63, 329.63, 392.00, 493.88],
+                [220.00, 261.63, 329.63, 392.00],
+                [174.61, 220.00, 261.63, 349.23],
+                [196.00, 246.94, 293.66, 392.00]
+            ];
+            const arpNotes = [523.25, 659.25, 783.99, 987.77, 880.00, 783.99, 659.25, 587.33];
+
+            const chord = chordProgression[Math.floor(stepIdx / 4) % chordProgression.length];
+
+            const filter = audioCtx.createBiquadFilter();
+            filter.type = 'lowpass';
+            filter.frequency.setValueAtTime(1450, now);
+            filter.Q.setValueAtTime(1.4, now);
+            filter.connect(audioCtx.destination);
+
+            if (stepIdx % 4 === 0) {
+                chord.forEach((freq) => {
+                    const padOsc = audioCtx.createOscillator();
+                    const padGain = audioCtx.createGain();
+                    padOsc.type = 'triangle';
+                    padOsc.frequency.setValueAtTime(freq, now);
+                    padGain.gain.setValueAtTime(0.0008, now);
+                    padGain.gain.linearRampToValueAtTime(0.022, now + 0.35);
+                    padGain.gain.exponentialRampToValueAtTime(0.0008, now + 1.55);
+                    padOsc.connect(padGain);
+                    padGain.connect(filter);
+                    padOsc.start(now);
+                    padOsc.stop(now + 1.6);
+                });
+            }
+
+            const arpFreq = arpNotes[stepIdx % arpNotes.length];
+            const pluckOsc = audioCtx.createOscillator();
+            const pluckGain = audioCtx.createGain();
+            pluckOsc.type = 'sine';
+            pluckOsc.frequency.setValueAtTime(arpFreq, now);
+            pluckGain.gain.setValueAtTime(0.001, now);
+            pluckGain.gain.linearRampToValueAtTime(0.032, now + 0.03);
+            pluckGain.gain.exponentialRampToValueAtTime(0.0008, now + 0.34);
+            pluckOsc.connect(pluckGain);
+            pluckGain.connect(filter);
+            pluckOsc.start(now);
+            pluckOsc.stop(now + 0.36);
+        } catch(e) {}
+    }
+
+    function startPremiumGameplayMusic() {
+        stopPremiumGameplayMusic();
+        if (!soundEnabled || !isGameRunning) return;
+        premiumBgmStep = 0;
+        triggerPremiumBgmNote(premiumBgmStep++);
+        premiumBgmInterval = setInterval(() => {
+            if (!soundEnabled || !isGameRunning) {
+                stopPremiumGameplayMusic();
+                return;
+            }
+            triggerPremiumBgmNote(premiumBgmStep++);
+        }, 380);
+    }
+
+    function stopPremiumGameplayMusic() {
+        if (premiumBgmInterval) {
+            clearInterval(premiumBgmInterval);
+            premiumBgmInterval = null;
+        }
+    }
+
+    function playTickTickSound() {
+        if (!soundEnabled) return;
+        try {
+            if (audioCtx.state === 'suspended') { audioCtx.resume(); }
+            const now = audioCtx.currentTime;
+            [0, 0.09].forEach((offset, idx) => {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'square';
+                osc.frequency.setValueAtTime(idx === 0 ? 920 : 740, now + offset);
+                gain.gain.setValueAtTime(0.08, now + offset);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + offset + 0.055);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start(now + offset);
+                osc.stop(now + offset + 0.06);
+            });
+        } catch(e) {}
+    }
+
+    function playUnlockSound() {
+        if (!soundEnabled) return;
+        try {
+            if (audioCtx.state === 'suspended') { audioCtx.resume(); }
+            const now = audioCtx.currentTime;
+            [523.25, 659.25, 783.99, 1046.50].forEach((freq, idx) => {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(freq, now + idx * 0.065);
+                gain.gain.setValueAtTime(0.22, now + idx * 0.065);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.065 + 0.18);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start(now + idx * 0.065);
+                osc.stop(now + idx * 0.065 + 0.19);
+            });
+        } catch(e) {}
+    }
+
+    function playSound(type) {
+        if (!soundEnabled) return;
+        try {
+            if (audioCtx.state === 'suspended') { audioCtx.resume(); }
+            let osc = audioCtx.createOscillator();
+            let gain = audioCtx.createGain();
+            osc.connect(gain); gain.connect(audioCtx.destination);
+            let now = audioCtx.currentTime;
+            if (type === 'jump') {
+                osc.type = 'sine'; osc.frequency.setValueAtTime(280, now); osc.frequency.exponentialRampToValueAtTime(560, now + 0.12);
+                gain.gain.setValueAtTime(0.4, now); gain.gain.exponentialRampToValueAtTime(0.01, now + 0.12);
+                osc.start(now); osc.stop(now + 0.12);
+            } else if (type === 'coin') {
+                osc.type = 'triangle'; osc.frequency.setValueAtTime(800, now); osc.frequency.setValueAtTime(1200, now + 0.08);
+                gain.gain.setValueAtTime(0.25, now); gain.gain.exponentialRampToValueAtTime(0.01, now + 0.2);
+                osc.start(now); osc.stop(now + 0.2);
+            } else if (type === 'score') {
+                osc.type = 'sine'; osc.frequency.setValueAtTime(500, now); osc.frequency.setValueAtTime(750, now + 0.1);
+                gain.gain.setValueAtTime(0.2, now); gain.gain.exponentialRampToValueAtTime(0.01, now + 0.15);
+                osc.start(now); osc.stop(now + 0.15);
+            } else if (type === 'hit') {
+                osc.type = 'sawtooth'; osc.frequency.setValueAtTime(150, now); osc.frequency.linearRampToValueAtTime(50, now + 0.2);
+                gain.gain.setValueAtTime(0.35, now); gain.gain.exponentialRampToValueAtTime(0.01, now + 0.2);
+                osc.start(now); osc.stop(now + 0.2);
+            } else if (type === 'click') {
+                osc.type = 'sine'; osc.frequency.setValueAtTime(700, now); osc.frequency.exponentialRampToValueAtTime(1000, now + 0.06);
+                gain.gain.setValueAtTime(0.4, now); gain.gain.exponentialRampToValueAtTime(0.01, now + 0.06);
+                osc.start(now); osc.stop(now + 0.06);
+            }
+        } catch(e) {}
+    }
+
+    function playClickSound() { playSound('click'); }
+    let soundEnabled = true;
+    
+    // Persistent storage helpers for coins and daily spin counts
+    function getStoredCoins() {
+        try {
+            let val = localStorage.getItem('fb_secure_coins');
+            if (val === null) { localStorage.setItem('fb_secure_coins', '0'); return 0; }
+            let parsed = parseInt(val, 10);
+            return isNaN(parsed) || parsed < 0 ? 0 : parsed;
+        } catch(e) {
+            return 0;
+        }
+    }
+
+    function setStoredCoins(amt) {
+        if (isNaN(amt) || amt < 0) amt = 0;
+        try {
+            localStorage.setItem('fb_secure_coins', amt.toString());
+        } catch(e) {}
+        updateCoinsUI();
+    }
+
+    function getTodayDateString() {
+        let d = new Date();
+        return `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`;
+    }
+
+    function getSpinData() {
+        try {
+            let lastDate = localStorage.getItem('fb_spin_date');
+            let currentDate = getTodayDateString();
+            let spinsCount = localStorage.getItem('fb_spin_count');
+            if (lastDate !== currentDate) {
+                localStorage.setItem('fb_spin_date', currentDate);
+                localStorage.setItem('fb_spin_count', '0');
+                return 0;
+            }
+            if (spinsCount === null) { localStorage.setItem('fb_spin_count', '0'); return 0; }
+            let parsed = parseInt(spinsCount, 10);
+            return isNaN(parsed) ? 0 : parsed;
+        } catch(e) {
+            return 0;
+        }
+    }
+
+    function incrementSpinCount() {
+        let currentCount = getSpinData();
+        try {
+            localStorage.setItem('fb_spin_count', (currentCount + 1).toString());
+        } catch(e) {}
+    }
+
+    let coins = getStoredCoins();
+    let score = 0;
+
+    // Bird character wing-flap sprites
+    const blueBirdDownImg = new Image(); blueBirdDownImg.src = 'https://raw.githubusercontent.com/mauryavikrant57-star/My-game-assets/refs/heads/main/IMG_20260803_110119.png';
+    const blueBirdUpImg = new Image(); blueBirdUpImg.src = 'https://raw.githubusercontent.com/mauryavikrant57-star/My-game-assets/refs/heads/main/IMG_20260803_110558.png';
+    const falconUpImg = new Image(); falconUpImg.src = 'https://raw.githubusercontent.com/mauryavikrant57-star/My-game-assets/17e8b48d0c2540b9447fcc425f3be2c93822d4d3/1000044845-removebg-preview.png';
+    const falconDownImg = new Image(); falconDownImg.src = 'https://raw.githubusercontent.com/mauryavikrant57-star/My-game-assets/3c6b880584ee6aa1252ba288aa565d267b301068/1000044848-removebg-preview.png';
+    const phoenixUpImg = new Image(); phoenixUpImg.src = 'https://raw.githubusercontent.com/mauryavikrant57-star/My-game-assets/refs/heads/main/1000044885-removebg-preview.png';
+    const phoenixDownImg = new Image(); phoenixDownImg.src = 'https://raw.githubusercontent.com/mauryavikrant57-star/My-game-assets/refs/heads/main/1000044886-removebg-preview.png';
+    const dragonUpImg = new Image(); dragonUpImg.src = 'https://raw.githubusercontent.com/mauryavikrant57-star/My-game-assets/refs/heads/main/1000044887-removebg-preview.png';
+    const dragonDownImg = new Image(); dragonDownImg.src = 'https://raw.githubusercontent.com/mauryavikrant57-star/My-game-assets/refs/heads/main/1000044888-removebg-preview.png';
+    const hawkUpImg = new Image(); hawkUpImg.src = 'https://raw.githubusercontent.com/mauryavikrant57-star/My-game-assets/refs/heads/main/1000044889-removebg-preview.png';
+    const hawkDownImg = new Image(); hawkDownImg.src = 'https://raw.githubusercontent.com/mauryavikrant57-star/My-game-assets/refs/heads/main/1000044890-removebg-preview.png';
+    const eagleUpImg = new Image(); eagleUpImg.src = 'https://raw.githubusercontent.com/mauryavikrant57-star/My-game-assets/refs/heads/main/1000044891-removebg-preview.png';
+    const eagleDownImg = new Image(); eagleDownImg.src = 'https://raw.githubusercontent.com/mauryavikrant57-star/My-game-assets/refs/heads/main/1000044892-removebg-preview.png';
+
+    const CHARACTER_LIST = {
+        blue: {
+            id: 'blue',
+            name: 'Blue Bird',
+            price: 0,
+            upImg: blueBirdUpImg,
+            downImg: blueBirdDownImg
+        },
+        falcon: {
+            id: 'falcon',
+            name: 'Cyber Falcon',
+            price: 20000,
+            upImg: falconUpImg,
+            downImg: falconDownImg
+        },
+        phoenix: {
+            id: 'phoenix',
+            name: 'Golden Phoenix',
+            price: 25000,
+            upImg: phoenixUpImg,
+            downImg: phoenixDownImg
+        },
+        dragon: {
+            id: 'dragon',
+            name: 'Neon Dragon',
+            price: 30000,
+            upImg: dragonUpImg,
+            downImg: dragonDownImg
+        },
+        hawk: {
+            id: 'hawk',
+            name: 'Shadow Hawk',
+            price: 35000,
+            upImg: hawkUpImg,
+            downImg: hawkDownImg
+        },
+        eagle: {
+            id: 'eagle',
+            name: 'Crystal Eagle',
+            price: 40000,
+            upImg: eagleUpImg,
+            downImg: eagleDownImg
+        }
+    };
+
+    const BACKGROUND_LIST = {
+        classic: {
+            id: 'classic',
+            name: 'Classic BG',
+            price: 0,
+            url: 'https://raw.githubusercontent.com/mauryavikrant57-star/My-game-assets/refs/heads/main/1783854852475.png'
+        },
+        neon: {
+            id: 'neon',
+            name: 'Neon City',
+            price: 15000,
+            url: 'https://raw.githubusercontent.com/mauryavikrant57-star/My-game-assets/refs/heads/main/1795140725496.png'
+        },
+        sunset: {
+            id: 'sunset',
+            name: 'Sunset Valley',
+            price: 20000,
+            url: 'https://raw.githubusercontent.com/mauryavikrant57-star/My-game-assets/refs/heads/main/1795140767249.png'
+        },
+        galaxy: {
+            id: 'galaxy',
+            name: 'Space Galaxy',
+            price: 25000,
+            url: 'https://raw.githubusercontent.com/mauryavikrant57-star/My-game-assets/refs/heads/main/1795255483850.png'
+        },
+        lava: {
+            id: 'lava',
+            name: 'Lava World',
+            price: 30000,
+            url: 'https://raw.githubusercontent.com/mauryavikrant57-star/My-game-assets/refs/heads/main/1795140865212.png'
+        },
+        ice: {
+            id: 'ice',
+            name: 'Ice Kingdom',
+            price: 35000,
+            url: 'https://raw.githubusercontent.com/mauryavikrant57-star/My-game-assets/refs/heads/main/1795140903135.png'
+        }
+    };
+
+    function loadUnlockedMap(storageKey, defaultUnlockedId) {
+        try {
+            const raw = localStorage.getItem(storageKey);
+            const parsed = raw ? JSON.parse(raw) : {};
+            parsed[defaultUnlockedId] = true;
+            return parsed;
+        } catch(e) {
+            return { [defaultUnlockedId]: true };
+        }
+    }
+
+    let unlockedCharacters = loadUnlockedMap('fb_unlocked_characters', 'blue');
+    let unlockedBackgrounds = loadUnlockedMap('fb_unlocked_backgrounds', 'classic');
+
+    let selectedCharacterId = 'blue';
+    let selectedBackgroundId = 'classic';
+    try {
+        selectedCharacterId = localStorage.getItem('fb_selected_character') || 'blue';
+    } catch(e) {}
+    if (!CHARACTER_LIST[selectedCharacterId] || !unlockedCharacters[selectedCharacterId]) {
+        selectedCharacterId = 'blue';
+    }
+
+    try {
+        selectedBackgroundId = localStorage.getItem('fb_selected_background') || 'classic';
+    } catch(e) {}
+    if (!BACKGROUND_LIST[selectedBackgroundId] || !unlockedBackgrounds[selectedBackgroundId]) {
+        selectedBackgroundId = 'classic';
+    }
+
+    function saveUnlockedState() {
+        try {
+            localStorage.setItem('fb_unlocked_characters', JSON.stringify(unlockedCharacters));
+            localStorage.setItem('fb_unlocked_backgrounds', JSON.stringify(unlockedBackgrounds));
+        } catch(e) {}
+    }
+
+    let toastTimeoutId = null;
+    function showShopSuccessToast() {
+        const toast = document.getElementById('shop-success-toast');
+        if (!toast) return;
+        toast.classList.remove('hidden');
+        if (toastTimeoutId) clearTimeout(toastTimeoutId);
+        toastTimeoutId = setTimeout(() => {
+            toast.classList.add('hidden');
+        }, 1250);
+    }
+
+    function applySelectedBackgroundImmediate() {
+        const bgObj = BACKGROUND_LIST[selectedBackgroundId] || BACKGROUND_LIST.classic;
+        const container = document.getElementById('game-container');
+        if (container) {
+            const prevTransition = container.style.transition;
+            container.style.transition = 'none';
+            container.style.background = `url('${bgObj.url}') no-repeat center center`;
+            container.style.backgroundSize = 'cover';
+            container.style.filter = 'brightness(1.06) contrast(1.08) saturate(1.16)';
+            void container.offsetWidth;
+            container.style.transition = prevTransition || 'filter 0.8s ease, background 1s ease';
+        }
+    }
+
+    function updateShopAndTapUI() {
+        const charIds = ['blue', 'falcon', 'phoenix', 'dragon', 'hawk', 'eagle'];
+        charIds.forEach(id => {
+            const item = CHARACTER_LIST[id];
+            const card = document.getElementById(`shop-char-${id}`);
+            const badge = document.getElementById(`badge-char-${id}`);
+            const isUnlocked = !!unlockedCharacters[id];
+            const isSelected = (selectedCharacterId === id);
+            if (card) {
+                card.classList.toggle('active-item', isSelected);
+                card.classList.toggle('locked-item', !isUnlocked);
+            }
+            if (badge) {
+                if (isSelected) {
+                    badge.className = 'shop-action-badge badge-active';
+                    badge.innerText = 'Equipped';
+                } else if (isUnlocked) {
+                    badge.className = 'shop-action-badge badge-free';
+                    badge.innerText = 'Equip';
+                } else {
+                    badge.className = 'shop-action-badge badge-locked';
+                    badge.innerText = `🔒 ${item.price} Coins`;
+                }
+            }
+        });
+
+        const bgIds = ['classic', 'neon', 'sunset', 'galaxy', 'lava', 'ice'];
+        bgIds.forEach(id => {
+            const item = BACKGROUND_LIST[id];
+            const card = document.getElementById(`shop-bg-${id}`);
+            const badge = document.getElementById(`badge-bg-${id}`);
+            const isUnlocked = !!unlockedBackgrounds[id];
+            const isSelected = (selectedBackgroundId === id);
+            if (card) {
+                card.classList.toggle('active-item', isSelected);
+                card.classList.toggle('locked-item', !isUnlocked);
+            }
+            if (badge) {
+                if (isSelected) {
+                    badge.className = 'shop-action-badge badge-active';
+                    badge.innerText = 'Equipped';
+                } else if (isUnlocked) {
+                    badge.className = 'shop-action-badge badge-free';
+                    badge.innerText = 'Equip';
+                } else {
+                    badge.className = 'shop-action-badge badge-locked';
+                    badge.innerText = `🔒 ${item.price} Coins`;
+                }
+            }
+        });
+    }
+
+    function handleShopCharacterClick(charId) {
+        const item = CHARACTER_LIST[charId];
+        if (!item) return;
+
+        if (!unlockedCharacters[charId]) {
+            const currentCoins = getStoredCoins();
+            if (currentCoins < item.price) {
+                playTickTickSound();
+                return;
+            }
+            setStoredCoins(currentCoins - item.price);
+            unlockedCharacters[charId] = true;
+            saveUnlockedState();
+            playUnlockSound();
+            updateShopAndTapUI();
+            return;
+        }
+
+        playClickSound();
+        equipCharacter(charId);
+    }
+
+    function handleShopBackgroundClick(bgId) {
+        const item = BACKGROUND_LIST[bgId];
+        if (!item) return;
+
+        if (!unlockedBackgrounds[bgId]) {
+            const currentCoins = getStoredCoins();
+            if (currentCoins < item.price) {
+                playTickTickSound();
+                return;
+            }
+            setStoredCoins(currentCoins - item.price);
+            unlockedBackgrounds[bgId] = true;
+            saveUnlockedState();
+            playUnlockSound();
+            updateShopAndTapUI();
+            return;
+        }
+
+        playClickSound();
+        equipBackground(bgId);
+    }
+
+    function equipCharacter(charId) {
+        if (!CHARACTER_LIST[charId] || !unlockedCharacters[charId]) return;
+        selectedCharacterId = charId;
+        try {
+            localStorage.setItem('fb_selected_character', charId);
+        } catch(e) {}
+        updateShopAndTapUI();
+        showShopSuccessToast();
+    }
+
+    function equipBackground(bgId) {
+        if (!BACKGROUND_LIST[bgId] || !unlockedBackgrounds[bgId]) return;
+        selectedBackgroundId = bgId;
+        try {
+            localStorage.setItem('fb_selected_background', bgId);
+        } catch(e) {}
+        applySelectedBackgroundImmediate();
+        updateShopAndTapUI();
+        showShopSuccessToast();
+    }
+
+    function openShopScreen() {
+        document.getElementById('main-menu').classList.add('hidden');
+        document.getElementById('shop-screen').classList.remove('hidden');
+        updateCoinsUI();
+        updateShopAndTapUI();
+    }
+
+    function closeShopScreen() {
+        document.getElementById('shop-screen').classList.add('hidden');
+        const toast = document.getElementById('shop-success-toast');
+        if (toast) toast.classList.add('hidden');
+        document.getElementById('main-menu').classList.remove('hidden');
+        updateCoinsUI();
+    }
+
+    // Coin, magnet power-up, and progressive pipe sprites
+    const coinImg = new Image(); coinImg.src = 'https://raw.githubusercontent.com/mauryavikrant57-star/My-game-assets/refs/heads/main/1000036484-removebg-preview.png';
+    const magnetPickupImg = new Image(); magnetPickupImg.src = 'https://raw.githubusercontent.com/mauryavikrant57-star/My-game-assets/refs/heads/main/1000036596-removebg-preview.png';
+
+    const greenPipeImg = new Image(); greenPipeImg.src = 'https://raw.githubusercontent.com/mauryavikrant57-star/My-game-assets/refs/heads/main/1000038121-removebg-preview.png';
+    const yellowPipeImg = new Image(); yellowPipeImg.src = 'https://raw.githubusercontent.com/mauryavikrant57-star/My-game-assets/refs/heads/main/1000038122-removebg-preview.png';
+    const bluePipeImg = new Image(); bluePipeImg.src = 'https://raw.githubusercontent.com/mauryavikrant57-star/My-game-assets/refs/heads/main/1000038123-removebg-preview.png';
+    const orangePipeImg = new Image(); orangePipeImg.src = 'https://raw.githubusercontent.com/mauryavikrant57-star/My-game-assets/refs/heads/main/1000038124-removebg-preview.png';
+    const redPipeImg = new Image(); redPipeImg.src = 'https://raw.githubusercontent.com/mauryavikrant57-star/My-game-assets/refs/heads/main/1000038152-removebg-preview.png';
+    const purplePipeImg = new Image(); purplePipeImg.src = 'https://raw.githubusercontent.com/mauryavikrant57-star/My-game-assets/refs/heads/main/1000038126-removebg-preview.png';
+    const magnetPipeImg = new Image(); magnetPipeImg.src = 'https://raw.githubusercontent.com/mauryavikrant57-star/My-game-assets/refs/heads/main/1000038132-removebg-preview.png';
+    const silverPipeImg = new Image(); silverPipeImg.src = 'https://raw.githubusercontent.com/mauryavikrant57-star/My-game-assets/refs/heads/main/1000038133-removebg-preview.png';
+    const goldPipeImg = new Image(); goldPipeImg.src = 'https://raw.githubusercontent.com/mauryavikrant57-star/My-game-assets/refs/heads/main/1000038134-removebg-preview.png';
+    const tealPipeImg = new Image(); tealPipeImg.src = 'https://raw.githubusercontent.com/mauryavikrant57-star/My-game-assets/refs/heads/main/1000038135-removebg-preview.png';
+    const diamondPipeImg = new Image(); diamondPipeImg.src = 'https://raw.githubusercontent.com/mauryavikrant57-star/My-game-assets/refs/heads/main/1000038136-removebg-preview.png';
+    const cosmicPipeImg = new Image(); cosmicPipeImg.src = 'https://raw.githubusercontent.com/mauryavikrant57-star/My-game-assets/refs/heads/main/1000038137-removebg-preview.png';
+    const platinumPipeImg = new Image(); platinumPipeImg.src = 'https://raw.githubusercontent.com/mauryavikrant57-star/My-game-assets/refs/heads/main/1000038138-removebg-preview.png';
+
+    let canvas = document.getElementById('gameCanvas');
+    let ctx = canvas.getContext('2d');
+    let logicalWidth = 360;
+    let logicalHeight = 640;
+
+    function resizeCanvas() {
+        const parent = canvas.parentElement;
+        if (!parent) return;
+        logicalWidth = parent.clientWidth || 360;
+        logicalHeight = parent.clientHeight || 640;
+        const dpr = Math.min(window.devicePixelRatio || 1, 3);
+        canvas.width = Math.round(logicalWidth * dpr);
+        canvas.height = Math.round(logicalHeight * dpr);
+        ctx = canvas.getContext('2d');
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        ctx.imageSmoothingEnabled = true;
+        ctx.imageSmoothingQuality = 'high';
+    }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    // Core gameplay simulation state
+    let gameInterval = null;
+    let isGameRunning = false;
+    let bird = { x: 85, y: 150, radius: 26, gravity: 0.22, lift: -5.2, velocity: 0 };
+    let pipes = [];
+    let gameCoins = [];
+    let worldMagnets = [];
+    let frameCount = 0;
+    let isMagnetActive = false;
+    let magnetTimer = 0;
+    const MAGNET_DURATION_FRAMES = 1500;
+    let lastMagnetMilestone = 0;
+    let coinAnimAngle = 0;
+    let pipesPassedCounter = 0;
+
+    function updateCoinsUI() {
+        coins = getStoredCoins();
+        let sc = document.getElementById('score-coins');
+        let mc = document.getElementById('menu-coins');
+        let shc = document.getElementById('shop-coins');
+        if(sc) sc.innerText = coins;
+        if(mc) mc.innerText = coins;
+        if(shc) shc.innerText = coins;
+    }
+
+    function toggleSound() {
+        soundEnabled = !soundEnabled;
+        let op = soundEnabled ? '1' : '0.4';
+        document.getElementById('btn-sound').style.opacity = op;
+        if (!soundEnabled) {
+            stopBackgroundAmbientMusic();
+            stopPremiumGameplayMusic();
+        } else if (isGameRunning) {
+            playBackgroundAmbientMusic();
+            startPremiumGameplayMusic();
+        }
+    }
+
+    function showAlertPopup(msg) {
+        document.getElementById('alert-message-text').innerText = msg;
+        document.getElementById('alert-popup-modal').classList.remove('hidden');
+    }
+
+    function closeAlertPopup() {
+        document.getElementById('alert-popup-modal').classList.add('hidden');
+    }
+
+    function goToHome() {
+        if(gameInterval) clearInterval(gameInterval);
+        isGameRunning = false;
+        stopBackgroundAmbientMusic();
+        stopPremiumGameplayMusic();
+        document.getElementById('gameplay-screen').classList.add('hidden');
+        document.getElementById('tap-to-start-screen').classList.add('hidden');
+        document.getElementById('game-over').classList.add('hidden');
+        document.getElementById('spin-modal').classList.add('hidden');
+        document.getElementById('alert-popup-modal').classList.add('hidden');
+        document.getElementById('privacy-policy-screen').classList.add('hidden');
+        document.getElementById('shop-screen').classList.add('hidden');
+        document.getElementById('admob-resume-overlay').classList.add('hidden');
+        document.getElementById('main-menu').classList.remove('hidden');
+        applySelectedBackgroundImmediate();
+        updateCoinsUI();
+    }
+
+    function openPrivacyPolicy() {
+        document.getElementById('main-menu').classList.add('hidden');
+        document.getElementById('privacy-policy-screen').classList.remove('hidden');
+    }
+
+    function closePrivacyPolicy() {
+        document.getElementById('privacy-policy-screen').classList.add('hidden');
+        document.getElementById('main-menu').classList.remove('hidden');
+    }
+
+    function goToTapToStart() {
+        document.getElementById('main-menu').classList.add('hidden');
+        document.getElementById('shop-screen').classList.add('hidden');
+        document.getElementById('game-over').classList.add('hidden');
+        document.getElementById('gameplay-screen').classList.remove('hidden');
+        document.getElementById('tap-to-start-screen').classList.remove('hidden');
+        document.getElementById('admob-resume-overlay').classList.add('hidden');
+        
+        document.getElementById('btn-home').style.display = 'block';
+
+        applySelectedBackgroundImmediate();
+        updateShopAndTapUI();
+        resizeCanvas();
+        
+        bird.y = logicalHeight / 2;
+        bird.velocity = 0;
+        pipes = [];
+        gameCoins = [];
+        worldMagnets = [];
+        score = 0;
+        frameCount = 0;
+        pipesPassedCounter = 0;
+        lastMagnetMilestone = 0;
+        isMagnetActive = false;
+        magnetTimer = 0;
+        isGameRunning = false;
+        stopBackgroundAmbientMusic();
+        stopPremiumGameplayMusic();
+        
+        document.getElementById('game-score-board').innerText = 'Score: ' + score;
+        if(gameInterval) clearInterval(gameInterval);
+        gameInterval = setInterval(updateGame, 1000 / 60);
+        updateCoinsUI();
+    }
+
+    function launchGameAfterTap() {
+        document.getElementById('tap-to-start-screen').classList.add('hidden');
+        document.getElementById('btn-home').style.display = 'none';
+
+        isGameRunning = true;
+        bird.velocity = bird.lift;
+        playSound('jump');
+        playBackgroundAmbientMusic();
+        startPremiumGameplayMusic();
+    }
+
+    function handleGameInput(e) {
+        if (
+            !document.getElementById('gameplay-screen').classList.contains('hidden') && 
+            document.getElementById('tap-to-start-screen').classList.contains('hidden') &&
+            document.getElementById('alert-popup-modal').classList.contains('hidden') &&
+            document.getElementById('admob-resume-overlay').classList.contains('hidden') &&
+            isGameRunning
+        ) {
+            if (e.cancelable) e.preventDefault();
+            bird.velocity = bird.lift;
+            playSound('jump');
+        }
+    }
+
+    window.addEventListener('pointerdown', handleGameInput, { passive: false });
+    canvas.addEventListener('touchstart', handleGameInput, { passive: false });
+
+    let admobCountdownTimer = null;
+
+    function triggerAdMobInterstitialAdSimulation() {
+        isGameRunning = false;
+        stopBackgroundAmbientMusic();
+        stopPremiumGameplayMusic();
+
+        let overlay = document.getElementById('admob-resume-overlay');
+        let countdownDisplay = document.getElementById('countdown-display');
+        overlay.classList.remove('hidden');
+
+        let count = 3;
+        countdownDisplay.innerText = count;
+
+        if (admobCountdownTimer) clearInterval(admobCountdownTimer);
+        admobCountdownTimer = setInterval(() => {
+            count--;
+            if (count > 0) {
+                countdownDisplay.innerText = count;
+            } else {
+                clearInterval(admobCountdownTimer);
+                completeAdMobResume();
+            }
+        }, 1000);
+    }
+
+    function manualResumeGame() {
+        if (admobCountdownTimer) clearInterval(admobCountdownTimer);
+        completeAdMobResume();
+    }
+
+    function completeAdMobResume() {
+        document.getElementById('admob-resume-overlay').classList.add('hidden');
+        isGameRunning = true;
+        if (soundEnabled) {
+            playBackgroundAmbientMusic();
+            startPremiumGameplayMusic();
+        }
+        bird.velocity = bird.lift;
+        playSound('jump');
+    }
+
+    function activateMagnet() {
+        isMagnetActive = true;
+        magnetTimer = MAGNET_DURATION_FRAMES;
+        playSound('coin');
+    }
+
+    function openSpinWheel() {
+        let wheel = document.getElementById('wheel');
+        wheel.style.transition = 'none';
+        wheel.style.transform = 'rotate(0deg)';
+        
+        let spinsDone = getSpinData();
+        let spinsLeft = 2 - spinsDone;
+        let limitText = document.getElementById('spin-limit-text');
+        let spinBtn = document.getElementById('btn-spin-action');
+
+        if (spinsLeft > 0) {
+            limitText.innerText = `Spins Left Today: ${spinsLeft}/2`;
+            spinBtn.style.display = 'block';
+        } else {
+            limitText.innerText = `⚠️ Daily limit reached! Resets at midnight.`;
+            spinBtn.style.display = 'none';
+        }
+        document.getElementById('spin-modal').classList.remove('hidden');
+    }
+
+    function closeSpinWheel() {
+        document.getElementById('spin-modal').classList.add('hidden');
+        updateCoinsUI();
+    }
+
+    let spinSoundInterval = null;
+    function playWoodCuttingSound() {
+        if (!soundEnabled) return;
+        try {
+            let osc = audioCtx.createOscillator();
+            let gain = audioCtx.createGain();
+            osc.connect(gain); gain.connect(audioCtx.destination);
+            let now = audioCtx.currentTime;
+            osc.type = 'sawtooth';
+            osc.frequency.setValueAtTime(120 + Math.random() * 60, now);
+            osc.frequency.linearRampToValueAtTime(70, now + 0.08);
+            gain.gain.setValueAtTime(0.18, now);
+            gain.gain.exponentialRampToValueAtTime(0.005, now + 0.08);
+            osc.start(now); osc.stop(now + 0.08);
+        } catch(e) {}
+    }
+
+    function spinWheelAction() {
+        let spinsDone = getSpinData();
+        if (spinsDone >= 2) {
+            showAlertPopup('You have completed 2 spins for today!');
+            return;
+        }
+        incrementSpinCount();
+        let btn = document.getElementById('btn-spin-action');
+        btn.style.display = 'none';
+        let wheel = document.getElementById('wheel');
+        
+        const wheelSectors = [
+            { min: 0,   max: 72,  coins: 500  }, 
+            { min: 72,  max: 144, coins: 1000 }, 
+            { min: 144, max: 216, coins: 1500 }, 
+            { min: 216, max: 288, coins: 2000 }, 
+            { min: 288, max: 360, coins: 2500 }  
+        ];
+
+        let randomStopDegree = Math.floor(Math.random() * 360);
+        let baseTurns = 360 * 10; 
+        let targetDegree = baseTurns + randomStopDegree;
+        
+        wheel.style.transition = 'transform 5s cubic-bezier(0.15, 0.85, 0.1, 1)';
+        wheel.style.transform = `rotate(${targetDegree}deg)`;
+
+        if (soundEnabled) {
+            let speedDelay = 35;
+            let elapsed = 0;
+            let totalSpinDuration = 5000;
+            if (spinSoundInterval) clearInterval(spinSoundInterval);
+            let runSpinSound = () => {
+                playWoodCuttingSound();
+                elapsed += speedDelay;
+                if (elapsed < totalSpinDuration) {
+                    speedDelay += 28;
+                    spinSoundInterval = setTimeout(runSpinSound, speedDelay);
+                } else {
+                    if (spinSoundInterval) clearInterval(spinSoundInterval);
+                }
+            };
+            runSpinSound();
+        }
+        
+        setTimeout(() => {
+            if (spinSoundInterval) clearInterval(spinSoundInterval);
+            let finalAngle = targetDegree % 360;
+            let correctionOffset = 36; 
+            let adjustedAngle = (360 - finalAngle + correctionOffset) % 360;
+            let matchedCoins = 500;
+            for (let sector of wheelSectors) {
+                if (adjustedAngle >= sector.min && adjustedAngle < sector.max) {
+                    matchedCoins = sector.coins;
+                    break;
+                }
+            }
+            closeSpinWheel();
+            setStoredCoins(getStoredCoins() + matchedCoins);
+            showAlertPopup(`🎉 Congratulations! You have won ${matchedCoins} Coins!`);
+        }, 5000);
+    }
+
+    function updateEnvironmentAndPipes(currentScore) {
+        let container = document.getElementById('game-container');
+        let cycle = Math.floor(currentScore / 300) % 4;
+        if (cycle === 0) container.style.filter = "brightness(1.06) contrast(1.08) saturate(1.16)";
+        else if (cycle === 1) container.style.filter = "brightness(1.03) contrast(1.07) saturate(1.15)";
+        else if (cycle === 2) container.style.filter = "brightness(1.02) contrast(1.08) saturate(1.18)";
+        else container.style.filter = "brightness(1.0) contrast(1.08) saturate(1.15)";
+
+        if (currentScore < 300) return greenPipeImg;
+        if (currentScore < 600) return yellowPipeImg;
+        if (currentScore < 900) return bluePipeImg;
+        if (currentScore < 1200) return orangePipeImg;
+        if (currentScore < 1500) return redPipeImg;
+        if (currentScore < 1800) return purplePipeImg;
+        if (currentScore < 2100) return magnetPipeImg;
+        if (currentScore < 2400) return goldPipeImg;
+        if (currentScore < 2700) return silverPipeImg;
+        if (currentScore < 3000) return tealPipeImg;
+        if (currentScore < 3500) return diamondPipeImg;
+        if (currentScore < 4000) return cosmicPipeImg;
+        return platinumPipeImg;
+    }
+
+    function drawNightSkyScene(w, h, currentScore) {
+        let nightPhase = Math.floor(currentScore / 300);
+        if (nightPhase % 2 !== 0) {
+            ctx.save();
+            ctx.fillStyle = 'rgba(5, 10, 25, 0.14)';
+            ctx.fillRect(0, 0, w, h);
+            let starSeed = 42;
+            for(let s = 0; s < 25; s++) {
+                let sx = (Math.sin(starSeed + s * 13) * 10000) % w;
+                let sy = (Math.cos(starSeed + s * 17) * 10000) % (h * 0.6);
+                if(sx < 0) sx += w;
+                if(sy < 0) sy += h * 0.6;
+                let twinkle = 0.2 + 0.8 * Math.abs(Math.sin(Date.now() / 250 + s * 3.5));
+                ctx.fillStyle = `rgba(255, 255, 255, ${twinkle})`;
+                ctx.beginPath(); ctx.arc(sx, sy, 1.8, 0, Math.PI * 2); ctx.fill();
+            }
+            ctx.globalAlpha = 0.9;
+            ctx.fillStyle = '#fffdf0';
+            ctx.beginPath(); ctx.arc(w - 110, 75, 22, 0, Math.PI * 2); ctx.fill();
+            ctx.fillStyle = 'rgba(5, 10, 25, 0.25)';
+            ctx.beginPath(); ctx.arc(w - 102, 69, 16, 0, Math.PI * 2); ctx.fill();
+            ctx.restore();
+        }
+    }
+
+    function drawWatermark(w, h) {
+        if (pipesPassedCounter > 0 && pipesPassedCounter % 5 === 0) {
+            ctx.save();
+            ctx.font = 'bold 22px Arial';
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.12)';
+            ctx.textAlign = 'center';
+            let progressY = h - ((frameCount * 0.8) % (h + 120));
+            ctx.fillText("Vikrant Maurya", w / 2, progressY);
+            ctx.restore();
+        }
+    }
+
+    function updateGame() {
+        try {
+            const w = logicalWidth;
+            const h = logicalHeight;
+            ctx.clearRect(0, 0, w, h);
+            drawNightSkyScene(w, h, score);
+
+            if (isGameRunning) {
+                bird.velocity += bird.gravity;
+                bird.y += bird.velocity;
+            } else {
+                bird.y = (h / 2) + Math.sin(Date.now() / 200) * 10;
+                bird.velocity = 0;
+            }
+
+            if(isMagnetActive) { magnetTimer--; if(magnetTimer <= 0) isMagnetActive = false; }
+
+            if(isGameRunning && (pipes.length === 0 || pipes[pipes.length - 1].x < w - 320)) {
+                let gap = 215;
+                let minHeight = 40;
+                let maxHeight = Math.max(minHeight + 20, h - gap - 80);
+                let topHeight = Math.floor(Math.random() * (maxHeight - minHeight + 1)) + minHeight;
+                let pipeWidth = 115;
+                let gapCenterY = topHeight + (gap / 2);
+                pipes.push({ x: w, top: topHeight, bottom: h - topHeight - gap, passed: false });
+
+                let currentMilestone = Math.floor(score / 300);
+                let shouldSpawnMagnetHere = (score >= 300 && currentMilestone > lastMagnetMilestone);
+                if (shouldSpawnMagnetHere) {
+                    lastMagnetMilestone = currentMilestone;
+                }
+
+                let startCoinX = w + 90;
+                let magnetIndex = shouldSpawnMagnetHere ? 1 : -1;
+
+                for(let cIdx = 0; cIdx < 4; cIdx++) {
+                    let itemX = startCoinX + (cIdx * 45);
+                    if (cIdx === magnetIndex) {
+                        worldMagnets.push({
+                            x: itemX,
+                            y: gapCenterY,
+                            baseY: gapCenterY,
+                            collected: false
+                        });
+                    } else {
+                        gameCoins.push({
+                            x: itemX,
+                            y: gapCenterY,
+                            baseY: gapCenterY,
+                            collected: false
+                        });
+                    }
+                }
+            }
+
+            let activePipeImg = updateEnvironmentAndPipes(score);
+            let progressiveMultiplier = 1 + (Math.min(score, 3000) * 0.00018);
+            let pipeSpeed = 2.2 * progressiveMultiplier;
+            let coinSpeed = 2.2 * progressiveMultiplier;
+
+            for(let i = pipes.length - 1; i >= 0; i--) {
+                if (isGameRunning) pipes[i].x -= pipeSpeed;
+                let pipeWidth = 115;
+                ctx.drawImage(activePipeImg, pipes[i].x, -20, pipeWidth, pipes[i].top + 20);
+                ctx.drawImage(activePipeImg, pipes[i].x, h - pipes[i].bottom, pipeWidth, pipes[i].bottom + 20);
+
+                if(!pipes[i].passed && pipes[i].x + pipeWidth < bird.x) {
+                    pipes[i].passed = true;
+                    score += 10;
+                    pipesPassedCounter++;
+                    document.getElementById('game-score-board').innerText = 'Score: ' + score;
+                    playSound('score');
+                }
+
+                let hitboxMargin = 18; 
+                let birdLeft = bird.x - bird.radius + hitboxMargin;
+                let birdRight = bird.x + bird.radius - hitboxMargin;
+                let birdTop = bird.y - bird.radius + hitboxMargin;
+                let birdBottom = bird.y + bird.radius - hitboxMargin;
+
+                if(isGameRunning && birdRight > pipes[i].x && birdLeft < pipes[i].x + pipeWidth) {
+                    if(birdTop < pipes[i].top || birdBottom > h - pipes[i].bottom) {
+                        playSound('hit');
+                        gameOver();
+                        return;
+                    }
+                }
+                if(pipes[i].x < -200) { pipes.splice(i, 1); }
+            }
+
+            coinAnimAngle += 0.1;
+
+            for(let i = worldMagnets.length - 1; i >= 0; i--) {
+                let m = worldMagnets[i];
+                if (isGameRunning) {
+                    m.x -= coinSpeed;
+                }
+                let floatingMagY = m.baseY + Math.sin(coinAnimAngle + i) * 6;
+                if(!m.collected) {
+                    ctx.save();
+                    ctx.shadowColor = 'rgba(0, 229, 255, 0.75)';
+                    ctx.shadowBlur = 10;
+                    ctx.drawImage(magnetPickupImg, m.x - 24, floatingMagY - 24, 48, 48);
+                    ctx.restore();
+                    let distMag = Math.hypot(bird.x - m.x, bird.y - floatingMagY);
+                    if(isGameRunning && distMag < bird.radius + 18) {
+                        m.collected = true;
+                        isMagnetActive = true;
+                        magnetTimer = MAGNET_DURATION_FRAMES;
+                        playSound('coin');
+                    }
+                }
+                if(m.x < -60 || m.collected) { worldMagnets.splice(i, 1); }
+            }
+
+            for(let i = gameCoins.length - 1; i >= 0; i--) {
+                let c = gameCoins[i];
+                if (isGameRunning) {
+                    if(isMagnetActive) {
+                        let dx = bird.x - c.x; let dy = bird.y - c.y;
+                        let distToBird = Math.hypot(dx, dy);
+                        if (distToBird > 2) { c.x += (dx / distToBird) * 14; c.y += (dy / distToBird) * 14; }
+                    } else { c.x -= coinSpeed; }
+                }
+
+                let floatingY = c.baseY + Math.sin(coinAnimAngle + i) * 6;
+                if(!c.collected) {
+                    let renderY = isMagnetActive ? c.y : floatingY;
+                    ctx.drawImage(coinImg, c.x - 22, renderY - 22, 44, 44);
+                    let dist = Math.hypot(bird.x - c.x, bird.y - renderY);
+                    if(isGameRunning && dist < bird.radius + 15) {
+                        c.collected = true;
+                        setStoredCoins(getStoredCoins() + 5);
+                        playSound('coin');
+                    }
+                }
+                if(c.x < -50 || c.collected) { gameCoins.splice(i, 1); }
+            }
+
+            ctx.save();
+            ctx.translate(bird.x, bird.y);
+            ctx.shadowColor = 'rgba(0, 0, 0, 0.72)';
+            ctx.shadowBlur = 8;
+            ctx.shadowOffsetX = 2;
+            ctx.shadowOffsetY = 4;
+            let wingFrame = Math.floor(Date.now() / 110) % 2;
+            const activeChar = CHARACTER_LIST[selectedCharacterId] || CHARACTER_LIST.blue;
+            let renderImg = (wingFrame === 0 || bird.velocity < 0) ? activeChar.upImg : activeChar.downImg;
+            ctx.drawImage(renderImg, -26, -26, 52, 52);
+            ctx.restore();
+
+            drawWatermark(w, h);
+
+            if(isGameRunning && (bird.y > h - 15 || bird.y < 0)) {
+                playSound('hit');
+                gameOver();
+                return;
+            }
+            if (isGameRunning) frameCount++;
+        } catch(e) {}
+    }
+
+    function gameOver() {
+        isGameRunning = false;
+        stopBackgroundAmbientMusic();
+        stopPremiumGameplayMusic();
+        clearInterval(gameInterval);
+        document.getElementById('btn-home').style.display = 'block';
+        document.getElementById('final-score').innerText = `Score: ${score} | Coins: ${getStoredCoins()}`;
+        document.getElementById('game-over').classList.remove('hidden');
+    }
+
+    function restartGameDirect() {
+        goToTapToStart();
+    }
+
+    applySelectedBackgroundImmediate();
+    updateShopAndTapUI();
+    updateCoinsUI();
+</script>
+</body>
+</html>
+```
